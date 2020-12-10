@@ -559,7 +559,7 @@ async function route(data){
 async function getMenu(data){
     s = await c(`SELECT * from menu order by menu_id desc`)
     let list = s.map((item)=>{
-        return {menuId:item.menu_id,menuName:item.menu_name,parentId:item.parent_id,path:item.path,component:item.component,menuType:item.menu_type,menuCreate:item.menu_create,menuModified:item.menu_modified,remark:item.remark,orderNum:item.order_num,icon:item.icon,son:item.son}
+        return {menuId:item.menu_id,menuName:item.menu_name,parentId:item.parent_id,path:item.path,component:item.component,menuType:item.menu_type,menuCreate:item.menu_create,menuModified:item.menu_modified,remark:item.remark,orderNum:item.order_num,icon:item.icon,son:item.son,perms:item.perms}
     })
     return {
         code:0,
@@ -572,7 +572,7 @@ async function getMenu(data){
 // 菜单新增
 async function addMenu(data){
     console.log('add',data)
-    let d = await c(`insert into menu (menu_name,parent_id,order_num,path,component,menu_type,remark,icon,menu_create,son) values ('${data.menuName}','${data.parentId}','${data.orderNum}','${data.path}','${data.component}','${data.menuType}','${data.remark}','${data.icon}','${data.time}','N');`)
+    let d = await c(`insert into menu (menu_name,parent_id,order_num,path,component,menu_type,remark,icon,menu_create,son,perms) values ('${data.menuName}','${data.parentId}','${data.orderNum}','${data.path}','${data.component}','${data.menuType}','${data.remark}','${data.icon}','${data.time}','N','${data.perms}');`)
     console.log('菜单新增',d)
     let b =data.parentId==0 ? "" : await c(`update menu set son = 'Y' where menu_id = ${data.parentId}`)
     if(d.insertId){
@@ -594,7 +594,7 @@ async function getMenuById(data){
         return {
             code:0,
             msg:'成功',
-            data:{menuId:s[0].menu_id,menuName:s[0].menu_name,parentId:s[0].parent_id,path:s[0].path,component:s[0].component,menuType:s[0].menu_type,menuCreate:s[0].menu_create,menuModified:s[0].menu_modified,remark:s[0].remark,orderNum:s[0].order_num,icon:s[0].icon}
+            data:{menuId:s[0].menu_id,menuName:s[0].menu_name,parentId:s[0].parent_id,path:s[0].path,component:s[0].component,menuType:s[0].menu_type,menuCreate:s[0].menu_create,menuModified:s[0].menu_modified,remark:s[0].remark,orderNum:s[0].order_num,icon:s[0].icon,perms:s[0].perms}
         }
     }else{
         return {
@@ -605,7 +605,7 @@ async function getMenuById(data){
 // 菜单修改
 async function uptMenu(data){
     let yuanPId = await c(`SELECT parent_id from menu where menu_id like '${data.menuId}'`)
-    let s1 = await c(`update menu set menu_name = '${data.menuName}',parent_id = '${data.parentId}',order_num = '${data.orderNum}',path = '${data.path}',component = '${data.component}',menu_type = '${data.menuType}',menu_modified = '${data.time}',remark = '${data.remark}',icon = '${data.icon}' where menu_id = ${data.menuId}`)
+    let s1 = await c(`update menu set menu_name = '${data.menuName}',parent_id = '${data.parentId}',order_num = '${data.orderNum}',path = '${data.path}',component = '${data.component}',menu_type = '${data.menuType}',menu_modified = '${data.time}',remark = '${data.remark}',icon = '${data.icon}',perms = '${data.perms}' where menu_id = ${data.menuId}`)
     let yuanPIdList = await c(`SELECT parent_id from menu where parent_id like '${yuanPId[0].parent_id}'`)
     if(yuanPIdList.length>0){
         await c(`update menu set son = 'Y' where menu_id = ${yuanPId[0].parent_id}`)

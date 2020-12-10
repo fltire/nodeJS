@@ -1,12 +1,5 @@
-const express = require('express');
-const path = require('path');
-const app = express();
-var url = require('url');    
-var mysql = require('mysql');
 var http = require('http');
 var {server} = require('./server')
-const { resolve } = require('path');
-var querystring = require('querystring')
 http.createServer(async function(req,res){
     res.setHeader('access-control-allow-origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type');
