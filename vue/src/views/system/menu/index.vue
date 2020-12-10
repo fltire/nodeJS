@@ -11,12 +11,13 @@
             </el-table-column>
             <el-table-column prop="menuType" label="菜单类型" width="80" align='center' >
                 <template slot-scope="scope">
-                    {{scope.row.menuType==='C' ? '菜单' : '目录'}}
+                    {{scope.row.menuType==='C' ? '菜单' :scope.row.menuType==='M' ? '目录' : '按钮'}}
                 </template>
             </el-table-column>
             <el-table-column prop="orderNum" label="菜单顺序" width="80" align='center'></el-table-column>
-            <el-table-column prop="menuCreate" label="创建时间"></el-table-column>
             <el-table-column prop="component" label="组件路径"> </el-table-column>
+            <el-table-column prop="perms" label="权限标识"> </el-table-column>
+            <el-table-column prop="menuCreate" label="创建时间"></el-table-column>
             <el-table-column fixed="right" label="操作" width="150">
                 <template slot-scope="scope">
                     <el-button @click="addOrUpdate(scope.row)"  type="text" size="small"><i id="del" class="el-icon-edit"></i> 修改</el-button>
@@ -29,7 +30,6 @@
 </template>
 <script>
 import {sendServer} from  '../../../utils/common'
-import AddOrUpdate from '../../home/addOrUpdate.vue';
 import addOrUpdate from './addOrUpdate'
 import icons from "../../../icons/index"
 export default {
@@ -142,8 +142,8 @@ export default {
                 return father[parentId] === rootId;
             });
             treeData.sort((a,b)=>{
-                    return a.orderNum > b.orderNum ? 1 : -1
-                })
+                return a.orderNum > b.orderNum ? 1 : -1
+            })
             return treeData != '' ? treeData : data;
         }
     }

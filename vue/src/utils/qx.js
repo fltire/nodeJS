@@ -98,7 +98,6 @@ function paixu(list){
 }
 function recursionList(arr,list){
     for(let i=0;i<arr.length;i++){
-        console.log( arr[i].icon)
         if(arr[i].parentId==0){
             if(arr[i].menuType==='C'){
                 list.push({path: '/'+arr[i].path,
@@ -146,11 +145,10 @@ function recursionList(arr,list){
             }
         }
         if(arr[i].children){
-            console.log(arr[i],i)
-            console.log(list[list.length-1].children)
             recursionList(arr[i].children,list[list.length-1].children)
         }
     }
+    return
 }
 function xiugai(list){
     let clontList = JSON.parse(JSON.stringify(list))
