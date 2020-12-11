@@ -1,9 +1,9 @@
 <template>
     <div class="main">
         <div class="top">
-            <el-button type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate()">新增</el-button>
-            <el-button type="success" size="mini" icon="el-icon-edit-outline" @click="addOrUpdate(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delUser()" :disabled='multipleSelection.length===0'>删除</el-button>
+            <el-button v-if="$isPermissions('role:add')" type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate()">新增</el-button>
+            <el-button v-if="$isPermissions('role:upt')" type="success" size="mini" icon="el-icon-edit-outline" @click="addOrUpdate(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
+            <el-button v-if="$isPermissions('role:del')" type="danger" size="mini" icon="el-icon-delete" @click="delUser()" :disabled='multipleSelection.length===0'>删除</el-button>
         </div>
         <el-table v-loading="listLoading" :data="dataList" style="width: 100%" :header-cell-style="{background:'#f8f8f9'}" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
@@ -11,8 +11,8 @@
             <el-table-column prop="roleCreate" label="创建时间"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
-                    <el-button size="mini" type="text" @click="delUser(scope.row.roleId)"><i class="el-icon-delete"></i>删除</el-button>
+                    <el-button size="mini" type="text" v-if="$isPermissions('role:upt')" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
+                    <el-button size="mini" type="text" v-if="$isPermissions('role:del')" @click="delUser(scope.row.roleId)"><i class="el-icon-delete"></i>删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -62,24 +62,27 @@ export default {
          * @method getRoleData
          */
         getRoleData(){
-            let Params = {},
-                send = {}
-            this.listLoading = true
-            Params.url = '/Servlet/selectpagerole'
-            // Params.url = '/f/role/getRoleData'
-            send.page = this.page
-            Params.send = send
-            sendServer(Params,this).then(
-                (res)=>{
-                    console.log(res)
-                    if(res.code===0){
-                        this.dataList = res.data.list
-                        this.count = res.data.count
-                        this.listLoading = false
+            if(this.$isPermissions('role:query')){
+                let Params = {},
+                    send = {}
+                this.listLoading = true
+                // Params.url = '/Servlet/selectpagerole'
+                Params.url = '/f/role/getRoleData'
+                send.page = this.page
+                Params.send = send
+                sendServer(Params,this).then(
+                    (res)=>{
+                        console.log(res)
+                        if(res.code===0){
+                            this.dataList = res.data.list
+                            this.count = res.data.count
+                            this.listLoading = false
+                        }
+                    },(res)=>{
                     }
-                },(res)=>{
-                }
-            )
+                )
+            }
+            
         },
 
         /**
@@ -114,8 +117,8 @@ export default {
             }).then(() => {
                 let Params = {},
                     send = {}
-                // Params.url = '/f/role/delRole'
-                Params.url = '/Servlet/deleterole'
+                Params.url = '/f/role/delRole'
+                // Params.url = '/Servlet/deleterole'
                 send.ids = arr
                 Params.send = send
                 sendServer(Params,this).then(

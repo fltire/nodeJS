@@ -16,8 +16,10 @@ import '@/icons' // icon
 import '@/permission' // permission control
 import echarts from 'echarts'
 import utils from '@/utils/public'
+import {isPermissions} from '@/utils/qx'
 Vue.prototype.$echarts = echarts
 Vue.prototype.$utils = utils
+Vue.prototype.$isPermissions = isPermissions
 
 /**
  * If you don't want to use mock-server

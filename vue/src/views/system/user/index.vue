@@ -18,9 +18,9 @@
                     <el-button @click="getUserData">查询</el-button>
                 </el-form-item>
             </el-form>
-            <el-button type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate">新增</el-button>
-            <el-button type="success" size="mini" icon="el-icon-edit-outline" @click="addOrUpdate(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delUser()" :disabled='multipleSelection.length===0'>删除</el-button>
+            <el-button v-if="$isPermissions('user:add')" type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate">新增</el-button>
+            <el-button v-if="$isPermissions('user:upt')" type="success" size="mini" icon="el-icon-edit-outline" @click="addOrUpdate(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
+            <el-button v-if="$isPermissions('user:del')" type="danger" size="mini" icon="el-icon-delete" @click="delUser()" :disabled='multipleSelection.length===0'>删除</el-button>
         </div>
         <el-table v-loading="listLoading" :data="dataList" style="width: 100%" :header-cell-style="{background:'#f8f8f9'}" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
@@ -31,8 +31,8 @@
             <el-table-column prop="userCreate" label="创建时间"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
-                    <el-button size="mini" type="text" @click="delUser(scope.row.userId)"><i class="el-icon-delete"></i>删除</el-button>
+                    <el-button v-if="$isPermissions('user:upt')" size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
+                    <el-button v-if="$isPermissions('user:del')" size="mini" type="text" @click="delUser(scope.row.userId)"><i class="el-icon-delete"></i>删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -81,27 +81,29 @@ export default {
          * @method getUserData
          */
         getUserData(){
-            let Params = {},
-                send = {}
-            this.listLoading = true
-            Params.url = '/Servlet/userselect'
-            // Params.url = '/f/user/getUserData'
-            send.page = this.page
-            send.userName = this.dataForm.userName
-            send.gender = this.dataForm.gender
-            send.phone = this.dataForm.phone
-            Params.send = send
-            sendServer(Params,this).then(
-                (res)=>{
-                    console.log(res)
-                    if(res.code===0){
-                        this.dataList = res.data.list
-                        this.count = res.data.count
-                        this.listLoading = false
+            if(this.$isPermissions('user:query')){
+                let Params = {},
+                    send = {}
+                this.listLoading = true
+                // Params.url = '/Servlet/userselect'
+                Params.url = '/f/user/getUserData'
+                send.page = this.page
+                send.userName = this.dataForm.userName
+                send.gender = this.dataForm.gender
+                send.phone = this.dataForm.phone
+                Params.send = send
+                sendServer(Params,this).then(
+                    (res)=>{
+                        console.log(res)
+                        if(res.code===0){
+                            this.dataList = res.data.list
+                            this.count = res.data.count
+                            this.listLoading = false
+                        }
+                    },(res)=>{
                     }
-                },(res)=>{
-                }
-            )
+                )
+            }
         },
         /**
          * 清空条件查询，并刷新数据
@@ -142,8 +144,8 @@ export default {
             }).then(() => {
                 let Params = {},
                     send = {}
-                Params.url = '/f/user/delUser'
-                // Params.url = '/Servlet/deleteuser'
+                // Params.url = '/f/user/delUser'
+                Params.url = '/Servlet/deleteuser'
                 send.ids = arr
                 Params.send = send
                 sendServer(Params,this).then(

@@ -48,7 +48,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: 'admin'
+        password: '123456'
       },
       loading: false,
       passwordType: 'password',
@@ -89,6 +89,7 @@ export default {
           Params.send = send
             sendServer(Params,this).then(
               (res)=>{
+                console.log(res)
                 if(res.code!==0){
                   this.$message.error('登陆失败');
                 }else{
@@ -98,10 +99,12 @@ export default {
                   //  let p = funcMap2List(res.data.permissions)
                   // localStorage.setItem('jurisdiction',JSON.stringify(p))
                   setToken(res.token)
-                  this.$router.push({ path:'/',query:{data:res} })
                   localStorage.setItem('userdata',JSON.stringify(res))
-                  let p = funcMap2List(res.jurisdiction)
+                  let p = funcMap2List(res.data.jurisdiction)
                   localStorage.setItem('jurisdiction',JSON.stringify(p))
+                  localStorage.setItem('routers',JSON.stringify(res.data.routers))
+                  localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
+                  this.$router.push({ path:'/'})
                 }
                 this.loading = false
                 

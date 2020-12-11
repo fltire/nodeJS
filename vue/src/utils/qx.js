@@ -59,20 +59,24 @@ const List2funcMap = function (list){
     return arr.join('')
 }
 function handleRoute(){
+    // console.log(JSON.parse(localStorage.getItem(routers)))
+    // return paixu(JSON.parse(localStorage.getItem(routers)))
 return new Promise(rrr =>{
-    let Params = {},
-    send = {}
-    Params.url = '/f/menu/getMenu'
-    Params.send = send
-    sendServer(Params,this).then(
-        (res)=>{
-            console.log(res)
-            let list = paixu(res.data.list)
-            // let list = xiugai(res.data.list)
-            rrr(list)
-        },(res)=>{
-        }
-        )
+    let list = paixu(JSON.parse(localStorage.getItem('routers')))
+    rrr(list)
+    // let Params = {},
+    // send = {}
+    // Params.url = '/f/menu/getMenu'
+    // Params.send = send
+    // sendServer(Params,this).then(
+    //     (res)=>{
+    //         console.log(res)
+    //         let list = paixu(res.data.list)
+    //         // let list = xiugai(res.data.list)
+    //         rrr(list)
+    //     },(res)=>{
+    //     }
+    //     )
     })
 }
 function paixu(list){
@@ -201,9 +205,14 @@ function xiugai(list){
     })
     return asyncRoutes
 }
+function isPermissions(data){
+    let permissions = JSON.parse(localStorage.getItem('permissions'))
+    return permissions.indexOf(data) !== -1 ? true : false
+}
 export{
     funcMap2List,
     role,
     List2funcMap,
-    handleRoute
+    handleRoute,
+    isPermissions
 }

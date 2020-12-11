@@ -2,7 +2,7 @@
   <div class="app-container">
     <div style="padding:20px">
         <!-- <el-button type="primary" v-if="$store.state.role.spxz" @click="goodsAdd">添加商品</el-button> -->
-        <el-button type="primary"  @click="goodsAdd" v-if="jurisdiction.goodsAdd">添加商品</el-button>
+        <el-button type="primary"  @click="goodsAdd" v-if="$isPermissions('goods:add')">添加商品</el-button>
     </div>
     <el-table v-loading="listLoading" :data="list" element-loading-text="Loading" border fit highlight-current-row>
       <!-- <el-table-column prop="GoodsId" align="center" label="商品id" width="95"></el-table-column> -->
@@ -13,8 +13,8 @@
       <el-table-column prop="GoodsAddDate" align="center" label="商品添加时间"></el-table-column>
       <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-              <el-button size="mini"  type="danger" @click="goodsDel(scope.row.id)"  v-if="jurisdiction.goodsDel">删除</el-button>
-              <el-button size="mini"  @click="goodsAdd(scope.row)"  v-if="jurisdiction.goodsUpt">修改</el-button>
+              <el-button size="mini"  type="danger" @click="goodsDel(scope.row.id)"  v-if="$isPermissions('goods:del')">删除</el-button>
+              <el-button size="mini"  @click="goodsAdd(scope.row)"  v-if="$isPermissions('goods:upt')">修改</el-button>
               <!-- <el-button size="mini" v-if="$store.state.role.spsc" type="danger" @click="goodsDel(scope.row.id)">删除</el-button>
               <el-button size="mini" v-if="$store.state.role.spxg" @click="goodsAdd(scope.row)">修改</el-button> -->
           </template>
@@ -100,7 +100,7 @@ export default {
     },
     //列表
     fetchData() {
-      if(this.jurisdiction.goodsQry){
+      if(this.$isPermissions('goods:query')){
         this.listLoading = true
         let Params = {}
         let send = {}

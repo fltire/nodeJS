@@ -8,9 +8,9 @@
                 <el-form-item label="权限" prop="quanxian">
                     <el-checkbox v-model="checked" @change='checkedChange'>全选/全不选</el-checkbox>
                     <el-tree
-                        :data="data"
+                        :data="tree"
                         show-checkbox
-                        node-key="FunctionId"
+                        node-key="menu_id"
                         ref="tree"
                         highlight-current
                         :default-checked-keys='keys'
@@ -35,10 +35,11 @@ export default {
     data() {
         return {
             dialogVisible: false,
-            data: [],
+            tree: [],
             defaultProps: {
                 children: 'children',
-                label: 'FunctionName'
+                label: 'menu_name',
+                value:'menu_id'
             },
             keys:[],
             checked:false,
@@ -54,40 +55,57 @@ export default {
         };
     },
     mounted () {
+        this.rolePermission()
+        console.log(this.$isPermissions('role:add'))
     },
     methods: {
+        rolePermission(){
+            let Params = {},
+                send = {}
+            Params.url = '/f/role/rolePermission'
+            Params.send = send
+            sendServer(Params,this).then(
+                (res)=>{
+                    console.log(res)
+                    if(res.code===0){
+                        this.tree = res.data.list
+                        console.log(this.tree)
+                    }
+                },(res)=>{
+                }
+            )
+        },
         init(data){
             console.log(data)
             this.keys = []
             this.id = null
             this.dialogVisible = true
             this.dataForm.roleName = ''
-            let arr = quanxian.Function
-            let tree = []
-            arr.forEach((item) => {
-                if(item.Level===1){
-                    tree.push(item)
-                    tree[tree.length-1].children = []
-                }else if(item.Level===2){
-                    tree[tree.length-1].children.push(item)
-                }
-            })
-            this.data = tree
             if(data!==undefined){
                 this.id = data.roleId
                 this.dataForm.roleName = data.roleName
-                let jur = funcMap2List(data.jurisdiction)
-                jur.forEach((item) => {
-                    if(item.Level===2){
-                        this.keys.push(item.FunctionId)
+                let Params = {},
+                    send = {}
+                Params.url = '/f/role/getRoleById'
+                send.roleId = data.roleId
+                Params.send = send
+                sendServer(Params,this).then(
+                    (res)=>{
+                        console.log(res)
+                        if(res.code===0){
+                            this.keys = res.data.permissions
+                            console.log(this.keys)
+                        }
+                    },(res)=>{
                     }
-                })
+                )
+                
             }
         },
         checkedChange(e){
             console.log(e)
             if(e===true){
-                this.$refs.tree.setCheckedNodes(this.data);
+                this.$refs.tree.setCheckedNodes(this.tree);
             }else{
                 this.$refs.tree.setCheckedKeys([]);
             }
@@ -97,13 +115,13 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    Params.url = this.id ? '/Servlet/updaterole' : '/Servlet/insertrole'
-                    // Params.url = this.id ? '/f/role/uptRole' : '/f/role/addRole'
+                    // Params.url = this.id ? '/Servlet/updaterole' : '/Servlet/insertrole'
+                    Params.url = this.id ? '/f/role/uptRole' : '/f/role/addRole'
                     if(this.id){
                         send.roleId = this.id
                     }
                     send.roleName = this.dataForm.roleName
-                    send.jurisdiction = List2funcMap(this.$refs.tree.getCheckedKeys().concat(this.$refs.tree.getHalfCheckedKeys()))
+                    send.permission = this.$refs.tree.getCheckedKeys().concat(this.$refs.tree.getHalfCheckedKeys())
                     Params.send = send
                     sendServer(Params,this).then(
                         (res)=>{
