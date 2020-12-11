@@ -70,50 +70,38 @@ async function mobileLogin(data1){
     let data = {
         token:'123',
         Name:'樊文的店铺',
-        StoreCurAmt:0,
-        StoreCurCnt:0,
-        StoreYesAmt:0,
-        StoreYesCnt:0,
-        StoreMonAmt:0,
-        StoreMonCnt:0,
     }
-    let s =await c(`SELECT user_name,password from user where user_name like '${data1.UserMobile}' and password like '${data1.USerPwd}'`)
+    let s =await c(`SELECT * from user where user_name like '${data1.UserMobile}' and password like '${data1.USerPwd}'`)
     let jurisdiction = null
     if(s.length!==0){
         let role = await c(`select role_id from user where user_name ='${data1.UserMobile}'`)
-        console.log(role)
         jurisdiction = await c(`select jurisdiction from role where role_id ='${role[0].role_id}'`)
-        console.log(jurisdiction)
     }
-    let date = new Date()
-    const Y = date.getFullYear();
-    const M = date.getMonth()+1;
-    const D = date.getDate();
-    const curDay = Y + '-'+ M + '-' + D;
-    let cur = await c(`SELECT * FROM sale WHERE time LIKE '${curDay}%'`)
-    let date1 = new Date(new Date()-24*60*60*1000)
-    const Y1 = date1.getFullYear();
-    const M1 = date1.getMonth()+1;
-    const D1 = date1.getDate();
-    const curDay1 = Y1 + '-'+ M1 + '-' + D1;
-    let yes  = await c(`SELECT * FROM sale WHERE time LIKE '${curDay1}%'`)
-    let mon  = await c(`SELECT * FROM sale WHERE time LIKE '${Y}-${M}%'`)
-    for(let i = 0;i<cur.length;i++){
-        data.StoreCurAmt+=Number(cur[i].money)
-    }
-    data.StoreCurCnt = cur.length
-    for(let i = 0;i<yes.length;i++){
-        data.StoreYesAmt+=Number(yes[i].money)
-    }
-    data.StoreYesCnt = yes.length
-    for(let i = 0;i<mon.length;i++){
-        data.StoreMonAmt+=Number(mon[i].money)
-    }
-    data.StoreMonCnt = mon.length
-    data.code=0
+    data.roleId = s[0].role_id
     data.jurisdiction = jurisdiction[0].jurisdiction
+    let permissions = []
+    let routers = []
     if(s.length!==0){
-        return data
+        let role = await c(`select menu_id from role_menu where role_id ='${s[0].role_id}'`)
+        for(let item = 0 ;item<role.length;item++){
+            let menu = await c(`select * from menu where menu_id ='${role[item].menu_id}'`)
+            if(menu[0].perms!=null&&menu[0].perms!=undefined){
+                permissions.push(menu[0].perms)
+            }
+            if(menu[0].menu_type!=='F'){
+                routers.push({menuId:menu[0].menu_id,menuName:menu[0].menu_name,parentId:menu[0].parent_id,path:menu[0].path,component:menu[0].component,menuType:menu[0].menu_type,menuCreate:menu[0].menu_create,menuModified:menu[0].menu_modified,remark:menu[0].remark,orderNum:menu[0].order_num,icon:menu[0].icon,son:menu[0].son,perms:menu[0].perms})
+            }
+        }
+        data.permissions = permissions
+        data.routers = routers
+    }
+    
+    if(s.length!==0){
+        return {
+            code:0,
+            msg:2,
+            data:data
+        }
     }else{
         return {msg:'登陆失败',code:200}
     }
@@ -493,7 +481,6 @@ async function getRoleData(data){
 }
 // 角色新增
 async function addRole(data){
-    console.log(data)
     // let role =await c(`SELECT role from role_id where role like '${data.role}'`)
     let rolename =await c(`SELECT role_name from role where role_name like '${data.roleName}'`)
     if(rolename.length!==0){
@@ -503,7 +490,10 @@ async function addRole(data){
         }
     }
     let d = await c(`insert into role (role_name,jurisdiction,role_create) values ('${data.roleName}','${data.jurisdiction}','${data.time}');`)
-    console.log(d)
+    console.log(d.insertId)
+    for(let i = 0 ; i<data.permission.length ; i++){
+        let f = await c(`insert into role_menu (role_id,menu_id) values ('${d.insertId}','${data.permission[i]}');`)
+    }
     if(d.insertId){
         return {
             code:0,
@@ -516,11 +506,57 @@ async function addRole(data){
         }
     }
 }
+// 角色新增时权限树
+async function rolePermission(){
+    s = await c(`SELECT * from menu order by menu_id desc`)
+    const cloneData = JSON.parse(JSON.stringify(s))
+    const treeData = cloneData.filter(father => {
+        let branchArr = cloneData.filter(child => {
+            return father.menu_id === child.parent_id
+        });
+        branchArr.sort((a,b)=>{
+            return a.order_num > b.order_num ? 1 : -1
+        })
+        branchArr.length > 0 ? father.children = branchArr : '';
+        return father.parent_id === 0;
+    });
+    treeData.sort((a,b)=>{
+        return a.order_num > b.order_num ? 1 : -1
+    })
+    return {
+        code:0,
+        msg:1,
+        data:{
+            list:treeData
+        }
+    }
+}
+// 通过角色id返回角色权限
+async function getRoleById(data){
+    let permissions = []
+    let role = await c(`select menu_id from role_menu where role_id ='${data.roleId}'`)
+    for(let item = 0 ;item<role.length;item++){
+        let menu = await c(`select * from menu where menu_id ='${role[item].menu_id}'`)
+        if(menu[0].menu_type==='F'){
+            permissions.push(menu[0].menu_id)
+        }
+    }
+    return {
+        msg:1,
+        code:0,
+        data:{
+            permissions
+        }
+    }
+}
 // 角色更新
 async function uptRole(data){
     console.log(data)
     let s = await c(`update role set role_name = '${data.roleName}',jurisdiction = '${data.jurisdiction}',role_modified = '${data.time}' where role_id = ${data.roleId}`)
-    console.log(s)
+    let a = await c(`delete from role_menu where role_id = ${data.roleId}`)
+    for(let i = 0 ; i<data.permission.length ; i++){
+        let f = await c(`insert into role_menu (role_id,menu_id) values ('${data.roleId}','${data.permission[i]}');`)
+    }
     if(s.affectedRows===1){
         return {
             code:0,
@@ -849,6 +885,9 @@ exports.server = async function(url,data){
         case '/f/role/addRole':
             return addRole(data)
             break
+        case '/f/role/rolePermission':
+            return rolePermission()
+            break
             // 角色更新
         case '/f/role/uptRole':
             return uptRole(data)
@@ -899,6 +938,9 @@ exports.server = async function(url,data){
             // 部门删除
         case '/f/dept/delDept':
             return delDept(data)
+            break;
+        case '/f/role/getRoleById':
+            return getRoleById(data)
             break;
 
     }
