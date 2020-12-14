@@ -50,7 +50,7 @@ export const constantRoutes = [
     children: [{
       path: 'home',
       name: '首页',
-      component: () => import('@/views/home/index'),
+      component: () => import('@/views/homePage/index'),
       meta: { title: '首页', icon: 'home' }
     }]
   },
@@ -66,183 +66,149 @@ export const constantRoutes = [
   //   }]
   // },
 ]
-export function permissions() {
+// export function permissions() {
   
- return asyncRoutes
-}
-export const asyncRoutes = [
-  {
-    path: '/',
-    component: Layout,
-    children: [{
-      path: 'home',
-      name: '首页',
-      component: () => import('@/views/home/index'),
-      meta: { title: '首页', icon: 'home' }
-    }]
-  },
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/user',
-    name: '用户管理',
-    meta: { title: '用户管理', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'user',
-        name: '用户管理',
-        component: () => import('@/views/system/user/index'),
-        meta: { title: '用户管理', icon: 'user' }
-      },
-      {
-        path: 'role',
-        name: '角色管理',
-        component: () => import('@/views/system/role/index'),
-        meta: { title: '角色管理', icon: 'role' }
-      },
-      {
-        path: 'menu',
-        name: '菜单管理',
-        component: () => import('@/views/system/menu/index'),
-        meta: { title: '菜单管理', icon: 'role' }
-      },
-      {
-        path: 'menu1',
-        name: '菜单管理1',
-        component:min,
-        hidden: false,
-        alwaysShow: true,
-        meta: { title: '菜单管理1', icon: 'role' },
-        children:[{
-          path: 'role',
-          hidden: false,
-          name: '角色3管理',
-          component: () => import('@/views/system/menu/index'),
-          meta: { title: '角色管3理', icon: 'role' }
-        },
-        {
-          path: 'ro2le',
-          hidden: false,
-          name: '角色33管理',
-          component: () => import('@/views/system/role/index'),
-          meta: { title: '角色2管3理', icon: 'role' }
-        }]
-      }
-    ]
-  },
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '表单',
-        component: () => import('@/views/form/index'),
-        meta: { title: '表单', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/goods',
-    component: Layout,
-    children: [
-      {
-        path: 'goods',
-        name: '商品',
-        component: () => import('@/views/goods/index'),
-        meta: { title: '商品', icon: 'goods' }
-      }
-    ]
-  },
-  {
-    path: '/role',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '角色',
-        component: () => import('@/views/role/index'),
-        meta: { title: '角色', icon: 'role' }
-      }
-    ]
-  },
-  {
-    path: '/staff',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '员工',
-        component: () => import('@/views/staff/index'),
-        meta: { title: '员工', icon: 'role' }
-      }
-    ]
-  },
-  {
-    path: '/report',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '报表',
-        component: () => import('@/views/report/index'),
-        meta: { title: '报表', icon: 'report' }
-      }
-    ]
-  },
-  {
-    path: '/tables',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '桌台',
-        component: () => import('@/views/tables/index'),
-        meta: { title: '桌台', icon: 'tables' }
-      }
-    ]
-  },
-  {
-    path: '/order',
-    component: Layout,
-    children: [
-      {
-        path: 'order',
-        name: '点餐',
-        component: () => import('@/views/tables/order'),
-        meta: { title: '点餐', icon: 'order' }
-      }
-    ]
-  },
-  {
-    path: '/issue',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '问题',
-        component: () => import('@/views/issue/index'),
-        meta: { title: '问题', icon: 'order' }
-      }
-    ]
-  },
-  {
-    path: '/quiz',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: '提问',
-        component: () => import('@/views/issue/quiz'),
-        meta: { title: '提问', icon: 'order' }
-      }
-    ]
-  },
-  { path: '*', redirect: '/404', hidden: true }
+//  return asyncRoutes
+// }
+// export const asyncRoutes = [
+//   {
+//     path: '/',
+//     component: Layout,
+//     children: [{
+//       path: 'home',
+//       name: '首页',
+//       component: () => import('@/views/homePage/index'),
+//       meta: { title: '首页', icon: 'home' }
+//     }]
+//   },
+//   {
+//     path: '/system',
+//     component: Layout,
+//     redirect: '/system/user',
+//     name: '用户管理',
+//     meta: { title: '用户管理', icon: 'el-icon-s-help' },
+//     children: [
+//       {
+//         path: 'user',
+//         name: '用户管理',
+//         component: () => import('@/views/system/user/index'),
+//         meta: { title: '用户管理', icon: 'user' }
+//       },
+//       {
+//         path: 'role',
+//         name: '角色管理',
+//         component: () => import('@/views/system/role/index'),
+//         meta: { title: '角色管理', icon: 'role' }
+//       },
+//       {
+//         path: 'menu',
+//         name: '菜单管理',
+//         component: () => import('@/views/system/menu/index'),
+//         meta: { title: '菜单管理', icon: 'role' }
+//       },
+//       {
+//         path: 'menu1',
+//         name: '菜单管理1',
+//         component:min,
+//         hidden: false,
+//         alwaysShow: true,
+//         meta: { title: '菜单管理1', icon: 'role' },
+//         children:[{
+//           path: 'role',
+//           hidden: false,
+//           name: '角色3管理',
+//           component: () => import('@/views/system/menu/index'),
+//           meta: { title: '角色管3理', icon: 'role' }
+//         },
+//         {
+//           path: 'ro2le',
+//           hidden: false,
+//           name: '角色33管理',
+//           component: () => import('@/views/system/role/index'),
+//           meta: { title: '角色2管3理', icon: 'role' }
+//         }]
+//       }
+//     ]
+//   },
+ 
+//   {
+//     path: '/goods',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'goods',
+//         name: '商品',
+//         component: () => import('@/views/goods/index'),
+//         meta: { title: '商品', icon: 'goods' }
+//       }
+//     ]
+//   },
 
-  // 404 page must be placed at the end !!!
+//   {
+//     path: '/report',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'index',
+//         name: '报表',
+//         component: () => import('@/views/report/index'),
+//         meta: { title: '报表', icon: 'report' }
+//       }
+//     ]
+//   },
+//   {
+//     path: '/tables',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'index',
+//         name: '桌台',
+//         component: () => import('@/views/tables/index'),
+//         meta: { title: '桌台', icon: 'tables' }
+//       }
+//     ]
+//   },
+//   {
+//     path: '/order',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'order',
+//         name: '点餐',
+//         component: () => import('@/views/tables/order'),
+//         meta: { title: '点餐', icon: 'order' }
+//       }
+//     ]
+//   },
+//   {
+//     path: '/issue',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'index',
+//         name: '问题',
+//         component: () => import('@/views/issue/index'),
+//         meta: { title: '问题', icon: 'order' }
+//       }
+//     ]
+//   },
+//   {
+//     path: '/quiz',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'index',
+//         name: '提问',
+//         component: () => import('@/views/issue/quiz'),
+//         meta: { title: '提问', icon: 'order' }
+//       }
+//     ]
+//   },
+//   { path: '*', redirect: '/404', hidden: true }
 
-]
+//   // 404 page must be placed at the end !!!
+
+// ]
 
 
 const createRouter = () => new Router({

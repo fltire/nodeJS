@@ -98,6 +98,18 @@ function paixu(list){
     console.log(arr)
     let rlist = []
     recursionList(cloneArr,rlist)
+    rlist.unshift(
+        {
+            path: '/',
+            component: Layout,
+            children: [{
+              path: 'home',
+              name: '首页',
+              component: () => import('@/views/homePage/index'),
+              meta: { title: '首页', icon: 'home' }
+            }]
+          }
+    )
     return rlist
 }
 function recursionList(arr,list){

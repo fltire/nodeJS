@@ -103,8 +103,8 @@ export default {
         getRole(){
             let Params = {},
                 send = {}
-            // Params.url = '/Servlet/roleselect'
-            Params.url = '/f/user/getRoleList'
+            Params.url = '/Servlet/selectrole'
+            // Params.url = '/f/user/getRoleList'
             Params.send = send
             sendServer(Params,this).then(
                 (res)=>{
@@ -125,8 +125,8 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    Params.url = this.id ? '/f/user/uptUser' : '/f/user/addUser'
-                    // Params.url = this.id ? '/Servlet/updateUser' : '/Servlet/insertUser'
+                    // Params.url = this.id ? '/f/user/uptUser' : '/f/user/addUser'
+                    Params.url = this.id ? '/Servlet/updateUser' : '/Servlet/insertUser'
                     if(this.id){
                         send.userId = this.id
                     }

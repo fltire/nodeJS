@@ -85,8 +85,8 @@ export default {
                 let Params = {},
                     send = {}
                 this.listLoading = true
-                // Params.url = '/Servlet/userselect'
-                Params.url = '/f/user/getUserData'
+                Params.url = '/Servlet/userselect'
+                // Params.url = '/f/user/getUserData'
                 send.page = this.page
                 send.userName = this.dataForm.userName
                 send.gender = this.dataForm.gender
@@ -123,9 +123,19 @@ export default {
             console.log(data)
             this.$refs.aou.init(data)
         },
+        /**
+         * 多选
+         * @method handleSelectionChange
+         * @param {array} val 选中的数据集合
+         */
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        /**
+         * 分页点击事件
+         * @method currenChange
+         * @param {number} e 点击的分页，要跳转到的页码
+         */
         currentChange(e){
             console.log(e)
             if(this.page!==e){
@@ -133,6 +143,11 @@ export default {
                 this.getUserData()
             }
         },
+        /**
+         * 删除
+         * @method delUser
+         * @param {number} id 点击行删除时要删除的数据的id
+         */
         delUser(id){
             console.log(id)
             let arr = id? [id] : this.multipleSelection.map(item => item.userId)

@@ -666,10 +666,16 @@ async function uptMenu(data){
 async function delMenu(data){
     let yuanPId = await c(`SELECT parent_id from menu where menu_id like '${data.menuId}'`)
     let p = await c(`SELECT menu_name from menu where parent_id like '${data.menuId}'`)
+    let s = await c(`SELECT * from role_menu where menu_id like '${data.menuId}'`)
     if(p.length!==0){
         return{
             code:1,
             msg:'此菜单有子节点，不能删除'
+        }
+    }else if(s.length!==0){
+        return{
+            code:1,
+            msg:'此菜单被使用，不能删除'
         }
     }else{
         await c(`delete from menu where menu_id = ${data.menuId}`)

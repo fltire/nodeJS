@@ -93,17 +93,14 @@ export default {
                 if(res.code!==0){
                   this.$message.error('登陆失败');
                 }else{
-                  // setToken('123')
-                  // this.$router.push({ path:'/',query:{data:res} })
-                  // localStorage.setItem('userdata',JSON.stringify(res))
-                  //  let p = funcMap2List(res.data.permissions)
-                  // localStorage.setItem('jurisdiction',JSON.stringify(p))
-                  setToken(res.token)
+                  setToken('123')
                   localStorage.setItem('userdata',JSON.stringify(res))
-                  let p = funcMap2List(res.data.jurisdiction)
-                  localStorage.setItem('jurisdiction',JSON.stringify(p))
                   localStorage.setItem('routers',JSON.stringify(res.data.routers))
                   localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
+                  // setToken(res.token)
+                  // localStorage.setItem('userdata',JSON.stringify(res))
+                  // localStorage.setItem('routers',JSON.stringify(res.data.routers))
+                  // localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   this.$router.push({ path:'/'})
                 }
                 this.loading = false

@@ -46,19 +46,12 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      let Params = {}
-      let send = {}
-      Params.url = '/f/user/logout'
-      Params.send = send
-      sendServer(Params,this).then(
-          (res)=>{
-          console.log(res.data)
+
+          window.localStorage.clear()
           localStorage.removeItem('rou')
           localStorage.removeItem('userdata')
           localStorage.removeItem('jurisdiction')
-          },(res)=>{
-          }
-      )
+
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

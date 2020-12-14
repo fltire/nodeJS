@@ -105,7 +105,11 @@ export default {
         
     },
     methods: {
-        changeRadio(e){
+        /**
+         * 单选按钮单击事件
+         * @method changeRadio
+         */
+        changeRadio(){
             this.dataForm.parentId = ''
         },
         /**
@@ -174,12 +178,13 @@ export default {
         getMenuById(e){
             let Params = {},
                 send = {}
-            Params.url = '/f/nemu/getMenuById'
+            Params.url = '/Servlet/selectidmenu'
+            // Params.url = '/f/nemu/getMenuById'
             send.menuId = e
             Params.send = send
             sendServer(Params,this).then(
                 (res)=>{
-                    console.log(res.data.parentId.toString().split(','))
+                    console.log(res)
                     if(res.code===0){
                         this.dataForm.menuName= res.data.menuName
                         this.dataForm.orderNum=res.data.orderNum
@@ -246,7 +251,8 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    Params.url = this.id ? '/f/menu/uptMenu' : '/f/menu/addMenu'
+                    Params.url = this.id ? '/Servlet/updatemenu' : '/Servlet/insertmenu'
+                    // Params.url = this.id ? '/f/menu/uptMenu' : '/f/menu/addMenu'
                     if(this.id){
                         send.menuId =this.id
                     }
