@@ -29,7 +29,7 @@ function list(){
 async function userdata(data1){
     let data = {
         token:'123',
-        Name:'樊文的店铺',
+        name:'樊文',
         StoreCurAmt:0,
         StoreCurCnt:0,
         StoreYesAmt:0,
@@ -69,12 +69,12 @@ async function mobileLogin(data1){
     console.log(data1)
     let data = {
         token:'123',
-        Name:'樊文的店铺',
+        name:'樊文',
     }
-    let s =await c(`SELECT * from user where user_name like '${data1.UserMobile}' and password like '${data1.USerPwd}'`)
+    let s =await c(`SELECT * from user where user_name like '${data1.userName}' and password like '${data1.password}'`)
     let jurisdiction = null
     if(s.length!==0){
-        let role = await c(`select role_id from user where user_name ='${data1.UserMobile}'`)
+        let role = await c(`select role_id from user where user_name ='${data1.userName}'`)
         jurisdiction = await c(`select jurisdiction from role where role_id ='${role[0].role_id}'`)
     }
     data.roleId = s[0].role_id
@@ -788,18 +788,6 @@ async function delDept(data){
 exports.server = async function(url,data){
     var sql
     switch(url){
-        case '/list':
-            return list()
-            break;
-        case '/add':
-            sql = `insert into user (username,password) values ('${query.username}','${query.password}');`;
-            break;
-        case '/update':
-            sql = `update user set username = '${query.username}',password = '${query.password}' where id = ${query.id}`
-            break;
-        case '/delete':
-            sql =  `delete from user where id = ${query.id}`
-            break;
             // 登录
         case '/f/userAction/mobileLogin':
             return mobileLogin(data)
