@@ -1,0 +1,10 @@
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (11, '辣子鸡1', '食品类', 'undefined', 25, 228, '2020/11/09-15:02:44', '');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (12, '鱼无双', '食品类', '1', 88, 429, '2020/11/09-15:05:30', NULL);
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (15, '麻辣烫', '食品类', '1', 18, 320, '2020/11/10-09:00:01', NULL);
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (16, '麻辣烫2', '食品类', '1', 18, 229, '2020/11/10-10:04:33', '');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (19, 'fw', '食品类', '1', 2, 530, '2020/11/10-09:15:49', '');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (21, '肯德基', '食品类', '1', 175, 0, 'undefined', '11');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (55, '12313', '食品类', '1', 12, 12, '2020-11-27 17:10:10', '1');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (56, 'qweqe', '服装类', '2', 123, 123, '2020-11-27 17:10:18', '123');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (72, '辣条3333', '1', 'undefined', 1, 1, '2020-12-4 14:8:37', '1');
+INSERT INTO `goods`(`id`, `GoodsName`, `GoodsTypeName`, `GoodsTypeId`, `GoodsRetailPrice`, `GoodsStock`, `GoodsAddDate`, `GoodsUnit`) VALUES (75, '旺仔牛奶1', '食品类', 'undefined', 1, 1, '2020-12-4 16:50:35', '1');

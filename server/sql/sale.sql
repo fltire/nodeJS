@@ -1,0 +1,10 @@
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (1, '2020-11-11 15:43:32', '1237');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (2, '2020-11-11 15:48:26', '74');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (3, '2020-11-11 16:30:16', '1490');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (4, '2020-11-11 18:30:16', '453');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (5, '2020-11-11 12:30:16', '543');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (6, '2020-11-10 17:06:10', '874');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (7, '2020-11-12 14:22:44', '1484');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (8, '2020-11-13 16:27:52', '1274');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (9, '2020-11-23 16:40:20', '698');
+INSERT INTO `sale`(`id`, `time`, `money`) VALUES (10, '2020-11-24 10:02:00', '1766');
