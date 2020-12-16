@@ -12,7 +12,7 @@ let axios = require('axios');
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter,asyncRoutes } from '@/router'
 import ElementUI from 'element-ui';
-
+import store from '../store'
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
@@ -38,6 +38,9 @@ const sendServer = (urlParams, me) => {
     let ssDate = util.ssformatTime(date);
     let params = {};
     let rc = "", sign = "";
+    if(urlParams.url!=='/f/userAction/mobileLogin'){
+        urlParams.send.token = 'admin'
+    }
     params = urlParams.send;
     // if (params.TxnId !== cfg.service.getLoginId.txnId) {
     //     if (LoginId) {
@@ -75,12 +78,13 @@ const sendServer = (urlParams, me) => {
             if (res.status === 200) {
                 if(res.data.code===123){
                     ElementUI.Message({
-                        message: '登录超时，请重新登陆',
+                        message: res.data.msg,
                         type: 'error'
                     });
                     window.localStorage.clear()
                     removeToken()
                     resetRouter()
+                    store.commit('user/SET_NAME','')
                     me.$router.push({ path:'/login'})
                 }else{
                     resolve(res.data)

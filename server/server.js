@@ -66,7 +66,6 @@ async function userdata(data1){
 }
 //登录
 async function mobileLogin(data1){
-    console.log(data1)
     let data = {
         token:'123',
         name:'樊文',
@@ -95,8 +94,9 @@ async function mobileLogin(data1){
         data.permissions = permissions
         data.routers = routers
     }
-    
+    let date = new Date().getTime()
     if(s.length!==0){
+        let d = await c(`insert into token (token,time) values ('${data1.userName}','${date}');`)
         return {
             code:0,
             msg:2,
@@ -351,7 +351,7 @@ async function getUserData(data){
     let s = ''
     let key = [],value = [],length
     for(let item in data){
-        if(item!=='page'&&data[item]!==''&&item!=='time'){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
             key.push(item)
             if(item==='userName'){
                 value.push(`user_name like '%${data[item]}%'`)
@@ -455,7 +455,7 @@ async function getRoleData(data){
     let s = '',length = null
     let key = [],value = []
     for(let item in data){
-        if(item!=='page'&&data[item]!==''&&item!=='time'){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
             key.push(item)
             value.push(`${item} like '%${data[item]}%'`)
         }
@@ -787,11 +787,37 @@ async function delDept(data){
 }
 exports.server = async function(url,data){
     var sql
+    let date = new Date().getTime()
+    if(url==='/f/userAction/mobileLogin'){
+        let s = await c(`select * from token where token ='${data.userName}'`)
+        if(s.length===0){
+            return mobileLogin(data)
+        }else if(date-s[0].time>1800000){
+            await c(`delete from token where token = '${data.userName}'`)
+            
+            return mobileLogin(data)
+        }else{
+            return{
+                code:123,
+                msg:'其他用户正在使用本账户'
+            }
+        }
+    }else{
+        let d = await c(`select * from token where token ='${data.token}'`)
+        console.log('d',d,d[0].time,date)
+        if(date-d[0].time>1800000){
+            await c(`delete from token where token = '${data.token}'`)
+            return{
+                code:123,
+                msg:'时间超出，请重新登陆'
+            }
+        }
+    }
     switch(url){
             // 登录
-        case '/f/userAction/mobileLogin':
-            return mobileLogin(data)
-            break;
+        // case '/f/userAction/mobileLogin':
+        //     return mobileLogin(data)
+        //     break;
             // 商品列表
         case '/f/goodsAction/goodsQry':
             return goodsQry(data)
