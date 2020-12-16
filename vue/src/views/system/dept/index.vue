@@ -19,13 +19,11 @@
 <script>
 import {sendServer} from  '../../../utils/common'
 import addOrUpdate from './addOrUpdate'
-import icons from "../../../icons/index"
 export default {
     data () {
         return {
             dataList: [],
             list: [],
-            icons:icons
         };
     },
     components: {
@@ -43,6 +41,7 @@ export default {
             if(this.$isPermissions('dept:query')){
                 let Params = {},
                     send = {}
+                // Params.url = '/Servlet/SelectDept'
                 Params.url = '/f/dept/getDept'
                 Params.send = send
                 sendServer(Params,this).then(
@@ -79,6 +78,7 @@ export default {
                 let Params = {},
                     send = {}
                 Params.url = '/f/dept/delDept'
+                // Params.url = '/Servlet/deletedept'
                 send.deptId = id
                 Params.send = send
                 sendServer(Params,this).then(

@@ -85,8 +85,8 @@ export default {
                 let Params = {},
                     send = {}
                 this.listLoading = true
-                Params.url = '/Servlet/userselect'
-                // Params.url = '/f/user/getUserData'
+                // Params.url = '/Servlet/userselect'
+                Params.url = '/f/user/getUserData'
                 send.page = this.page
                 send.userName = this.dataForm.userName
                 send.gender = this.dataForm.gender
@@ -159,8 +159,8 @@ export default {
             }).then(() => {
                 let Params = {},
                     send = {}
-                // Params.url = '/f/user/delUser'
-                Params.url = '/Servlet/deleteuser'
+                Params.url = '/f/user/delUser'
+                // Params.url = '/Servlet/deleteuser'
                 send.ids = arr
                 Params.send = send
                 sendServer(Params,this).then(

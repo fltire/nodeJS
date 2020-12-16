@@ -1,5 +1,4 @@
 import router from './router'
-import {asyncRoutes,permissions} from './router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // 进度条

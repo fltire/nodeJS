@@ -80,11 +80,10 @@ export default {
           this.loading = true
           let Params = {}
           let send = {}
-          send.UserMobile = this.loginForm.username
-          send.USerPwd = this.loginForm.password
+
           Params.url = '/f/userAction/mobileLogin'
-          // send.userName = this.loginForm.username
-          // send.password = this.loginForm.password
+          send.userName = this.loginForm.username
+          send.password = this.loginForm.password
           // Params.url = '/Servlet/login'
           Params.send = send
             sendServer(Params,this).then(
@@ -94,13 +93,13 @@ export default {
                   this.$message.error('登陆失败');
                 }else{
                   setToken('123')
+                  // localStorage.setItem('userdata',JSON.stringify(res))
+                  // localStorage.setItem('routers',JSON.stringify(res.data.arr))
+                  // localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
+                  // setToken(res.token)
                   localStorage.setItem('userdata',JSON.stringify(res))
                   localStorage.setItem('routers',JSON.stringify(res.data.routers))
                   localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
-                  // setToken(res.token)
-                  // localStorage.setItem('userdata',JSON.stringify(res))
-                  // localStorage.setItem('routers',JSON.stringify(res.data.routers))
-                  // localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   this.$router.push({ path:'/'})
                 }
                 this.loading = false

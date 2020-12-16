@@ -2,10 +2,10 @@
     <div>
         <el-dialog title="新增" :visible.sync="dialogVisible" width="800px" >
            <el-form :model="dataForm" ref="dataForm" :rules="rules" label-width="100px" class="demo-ruleForm" style="overflow:hidden">
-                <el-form-item label="用户名称" prop="username" style="width:50%;float:left">
+                <el-form-item label="用户名称" prop="userName" style="width:50%;float:left">
                     <el-input v-model="dataForm.userName" ></el-input>
                 </el-form-item>
-                <el-form-item label="用户昵称" prop="nickname" style="width:50%;float:left">
+                <el-form-item label="用户昵称" prop="nickName" style="width:50%;float:left">
                     <el-input v-model="dataForm.nickName" ></el-input>
                 </el-form-item>
                 <el-form-item label="手机号码" prop="phone" style="width:50%;float:left">
@@ -16,11 +16,16 @@
                         <el-option v-for="item in genderList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="角色" prop="role" style="float:left;width:100%" >
+                <el-form-item label="角色" prop="roleId" style="float:left;width:50%" >
                     <el-select v-model="dataForm.roleId" placeholder="请选择" style="width:100%">
                         <el-option v-for="item in roleList" :key="item.roleName" :label="item.roleName" :value="item.roleId"></el-option>
                     </el-select>
                 </el-form-item>
+                <!-- <el-form-item label="角色" prop="dept" style="float:left;width:50%" >
+                    <el-select v-model="dataForm.deptId" placeholder="请选择" style="width:100%">
+                        <el-option v-for="item in deptList" :key="item.deptName" :label="item.deptName" :value="item.deptId"></el-option>
+                    </el-select>
+                </el-form-item> -->
                 <el-form-item label="备注" prop="remark" style="float:left;width:100%">
                     <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="dataForm.remark"></el-input>
                 </el-form-item>
@@ -100,11 +105,45 @@ export default {
                 this.dataForm.roleId = data.roleId
             }
         },
+        /**
+         * 级联选择器回溯
+         * @method echo
+         * @param {number} e 要回溯到的位置
+         */
+        echo(e){
+            let arr = []
+            let p = JSON.parse(JSON.stringify(this.options))
+            let out=false;
+            function fun(p){
+                let bg = 0
+                for(let item of p){
+                    if(item.deptId === e){
+                        arr.push(item.deptId)
+                        out=true
+                        return
+                    }else if(item.children && item.children.length > 0){
+                        arr.push(item.deptId)
+                        fun(item.children)
+                    }
+                    bg++
+                    if(out) return
+                    if(bg===p.length&&arr&&arr.length>0){
+                        arr = [0]
+                    }
+                }      
+            }
+            fun(p)
+            return arr
+        },
+        /**
+         * 获取所有角色
+         * @method getRole
+         */
         getRole(){
             let Params = {},
                 send = {}
-            Params.url = '/Servlet/selectrole'
-            // Params.url = '/f/user/getRoleList'
+            // Params.url = '/Servlet/selectrole'
+            Params.url = '/f/user/getRoleList'
             Params.send = send
             sendServer(Params,this).then(
                 (res)=>{
@@ -125,8 +164,8 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    // Params.url = this.id ? '/f/user/uptUser' : '/f/user/addUser'
-                    Params.url = this.id ? '/Servlet/updateUser' : '/Servlet/insertUser'
+                    Params.url = this.id ? '/f/user/uptUser' : '/f/user/addUser'
+                    // Params.url = this.id ? '/Servlet/updateUser' : '/Servlet/insertUser'
                     if(this.id){
                         send.userId = this.id
                     }

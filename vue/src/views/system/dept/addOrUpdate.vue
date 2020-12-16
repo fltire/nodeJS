@@ -180,6 +180,7 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
+                    // Params.url = this.id ? '/Servlet/updatedept' : '/Servlet/insertdept'
                     Params.url = this.id ? '/f/dept/uptDept' : '/f/dept/addDept'
                     if(this.id){
                         send.deptId =this.id

@@ -66,8 +66,8 @@ export default {
                 let Params = {},
                     send = {}
                 this.listLoading = true
-                Params.url = '/Servlet/selectpagerole'
-                // Params.url = '/f/role/getRoleData'
+                // Params.url = '/Servlet/selectpagerole'
+                Params.url = '/f/role/getRoleData'
                 send.page = this.page
                 Params.send = send
                 sendServer(Params,this).then(
@@ -132,8 +132,8 @@ export default {
             }).then(() => {
                 let Params = {},
                     send = {}
-                // Params.url = '/f/role/delRole'
-                Params.url = '/Servlet/deleterole'
+                Params.url = '/f/role/delRole'
+                // Params.url = '/Servlet/deleterole'
                 send.ids = arr
                 Params.send = send
                 sendServer(Params,this).then(

@@ -45,15 +45,12 @@ export default {
       listLoading: true,
       AllCount:null,
       page:1,
-      jurisdiction:{}
     }
   },
   components:{
       add
   },
   created() {
-    this.jurisdiction = role(JSON.parse(localStorage.getItem('jurisdiction')))
-    console.log(this.jurisdiction)
     this.fetchData()
   },
   mounted () {

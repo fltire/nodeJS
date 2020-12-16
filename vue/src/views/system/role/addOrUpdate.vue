@@ -67,8 +67,8 @@ export default {
         rolePermission(){
             let Params = {},
                 send = {}
-            // Params.url = '/f/role/rolePermission'
-            Params.url = '/Servlet/insertselectmenu'
+            Params.url = '/f/role/rolePermission'
+            // Params.url = '/Servlet/insertselectmenu'
             Params.send = send
             sendServer(Params,this).then(
                 (res)=>{
@@ -100,8 +100,8 @@ export default {
                     this.dataForm.roleName = data.roleName
                     let Params = {},
                         send = {}
-                    // Params.url = '/f/role/getRoleById'
-                    Params.url = '/Servlet/selectmenuId '
+                    Params.url = '/f/role/getRoleById'
+                    // Params.url = '/Servlet/selectmenuId '
                     send.roleId = data.roleId
                     Params.send = send
                     sendServer(Params,this).then(
@@ -141,8 +141,8 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    Params.url = this.id ? '/Servlet/updaterole' : '/Servlet/insertrole'
-                    // Params.url = this.id ? '/f/role/uptRole' : '/f/role/addRole'
+                    // Params.url = this.id ? '/Servlet/updaterole' : '/Servlet/insertrole'
+                    Params.url = this.id ? '/f/role/uptRole' : '/f/role/addRole'
                     if(this.id){
                         send.roleId = this.id
                     }

@@ -22,7 +22,6 @@ const funcMap2List = function (jurisdiction){
             arr.push(item)
         }
     }
-    console.log(arr)
     return arr
 }
 const role = function (jurisdiction){
@@ -95,7 +94,6 @@ function paixu(list){
       return a.orderNum>b.orderNum ? 1 : -1
     })
     let cloneArr = JSON.parse(JSON.stringify(arr))
-    console.log(arr)
     let rlist = []
     recursionList(cloneArr,rlist)
     rlist.unshift(
@@ -106,7 +104,7 @@ function paixu(list){
               path: 'home',
               name: '首页',
               component: () => import('@/views/homePage/index'),
-              meta: { title: '首页', icon: 'home' }
+              meta: { title: '首页', icon: 'dashboard' }
             }]
           }
     )
@@ -139,7 +137,6 @@ function recursionList(arr,list){
             }
         }else{
             if(arr[i].menuType==='C'){
-                console.log(list)
                 list.push({
                     path: arr[i].path,
                     hidden: false,

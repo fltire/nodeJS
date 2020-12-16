@@ -55,8 +55,8 @@ export default {
             if(this.$isPermissions('menu:query')){
                 let Params = {},
                     send = {}
-                Params.url = '/Servlet/selectmenu'
-                // Params.url = '/f/menu/getMenu'
+                // Params.url = '/Servlet/selectmenu'
+                Params.url = '/f/menu/getMenu'
                 Params.send = send
                 sendServer(Params,this).then(
                     (res)=>{
@@ -91,8 +91,8 @@ export default {
             }).then(() => {
                 let Params = {},
                     send = {}
-                Params.url = '/Servlet/deletemenu'
-                // Params.url = '/f/menu/delMenu'
+                // Params.url = '/Servlet/deletemenu'
+                Params.url = '/f/menu/delMenu'
                 send.menuId = id
                 Params.send = send
                 sendServer(Params,this).then(

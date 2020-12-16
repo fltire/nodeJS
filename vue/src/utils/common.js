@@ -8,6 +8,11 @@ let cfg = require("./../config/casher.function.js");
 let des = require('./des.js');
 let util = require('./util.js');
 let axios = require('axios');
+
+import { getToken, setToken, removeToken } from '@/utils/auth'
+import { resetRouter,asyncRoutes } from '@/router'
+import ElementUI from 'element-ui';
+
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
@@ -68,7 +73,18 @@ const sendServer = (urlParams, me) => {
     service.post(urlParams.url, urlParams.send).then((res) => {
             // console.log(res)
             if (res.status === 200) {
-                resolve(res.data)
+                if(res.data.code===123){
+                    ElementUI.Message({
+                        message: '登录超时，请重新登陆',
+                        type: 'error'
+                    });
+                    window.localStorage.clear()
+                    removeToken()
+                    resetRouter()
+                    me.$router.push({ path:'/login'})
+                }else{
+                    resolve(res.data)
+                }
             //     // console.log('data', res.data);//debug
             //     var unPackRes = pub.unPack(res.data);
             //     if (unPackRes.RespCode === '1076') {

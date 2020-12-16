@@ -178,8 +178,8 @@ export default {
         getMenuById(e){
             let Params = {},
                 send = {}
-            Params.url = '/Servlet/selectidmenu'
-            // Params.url = '/f/nemu/getMenuById'
+            // Params.url = '/Servlet/selectidmenu'
+            Params.url = '/f/nemu/getMenuById'
             send.menuId = e
             Params.send = send
             sendServer(Params,this).then(
@@ -251,8 +251,8 @@ export default {
                 if (valid) {
                     let Params = {},
                         send = {}
-                    Params.url = this.id ? '/Servlet/updatemenu' : '/Servlet/insertmenu'
-                    // Params.url = this.id ? '/f/menu/uptMenu' : '/f/menu/addMenu'
+                    // Params.url = this.id ? '/Servlet/updatemenu' : '/Servlet/insertmenu'
+                    Params.url = this.id ? '/f/menu/uptMenu' : '/f/menu/addMenu'
                     if(this.id){
                         send.menuId =this.id
                     }
