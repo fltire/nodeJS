@@ -1,13 +1,13 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter,asyncRoutes } from '@/router'
+import { resetRouter} from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
     avatar: '',
-    asyncRoutes:asyncRoutes
+    // asyncRoutes:asyncRoutes
   }
 }
 

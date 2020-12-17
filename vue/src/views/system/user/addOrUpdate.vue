@@ -21,11 +21,9 @@
                         <el-option v-for="item in roleList" :key="item.roleName" :label="item.roleName" :value="item.roleId"></el-option>
                     </el-select>
                 </el-form-item>
-                <!-- <el-form-item label="角色" prop="dept" style="float:left;width:50%" >
-                    <el-select v-model="dataForm.deptId" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in deptList" :key="item.deptName" :label="item.deptName" :value="item.deptId"></el-option>
-                    </el-select>
-                </el-form-item> -->
+                <el-form-item label="部门" prop="deptId" style="float:left;width:50%" >
+                    <el-cascader ref="deptTree" @change='getDept' :options="options" v-model="dataForm.deptId" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>
+                </el-form-item>
                 <el-form-item label="备注" prop="remark" style="float:left;width:100%">
                     <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="dataForm.remark"></el-input>
                 </el-form-item>
@@ -50,7 +48,9 @@ export default {
                 phone: '',
                 gender: '',
                 remark: '',
-                roleId: null
+                roleId: null,
+                deptId: null,
+                deptName: ''
             },
             id: '',
             roleList: [],
@@ -58,6 +58,11 @@ export default {
                 {value: '0',label: '女'},
                 {value: '1',label: '男'}
             ],
+            options: [],
+            props:{
+                value: 'dept_id',
+                label: 'dept_name'
+            },
             rules: {
                 userName: [
                     { required: true, message: '请输入用户名称', trigger: 'blur' }
@@ -74,11 +79,37 @@ export default {
                 ],
                 roleId:[
                     { required: true, message: '请选择角色', trigger: 'blur' }
+                ],
+                deptId:[
+                    { required: true, message: '请选择部门', trigger: 'blur' }
                 ]
             },
         };
     },
+    mounted () {
+      this.getUserDept()  
+    },
     methods: {
+        getDept(e){
+            setTimeout(() => {
+                console.log(this.$refs.deptTree.inputValue)
+                this.dataForm.deptName = this.$refs.deptTree.inputValue
+            }, 100);
+        },
+        getUserDept(){
+            let Params = {},
+                send = {}
+            Params.url = '/f/user/getUserDept'
+            Params.send = send
+            sendServer(Params,this).then(
+                (res)=>{
+                    console.log(res)
+                    if(res.code===0){
+                        this.options = res.data.list
+                    }
+                }
+            )
+        },
         /**
          * 初始化数据
          * @method init 
@@ -92,6 +123,8 @@ export default {
             this.dataForm.gender = null
             this.dataForm.remark = ''
             this.dataForm.roleId = null
+            this.dataForm.deptId = null
+            this.dataForm.deptName = ''
             this.getRole()
             // this.$refs.dataForm.resetFields();
             this.id = ''
@@ -103,6 +136,8 @@ export default {
                 this.dataForm.gender = data.gender
                 this.dataForm.remark = data.remark
                 this.dataForm.roleId = data.roleId
+                this.dataForm.deptName = data.deptName
+                this.dataForm.deptId = this.echo(data.deptId)
             }
         },
         /**
@@ -117,22 +152,23 @@ export default {
             function fun(p){
                 let bg = 0
                 for(let item of p){
-                    if(item.deptId === e){
-                        arr.push(item.deptId)
+                    if(item.dept_id === e){
+                        arr.push(item.dept_id)
                         out=true
                         return
                     }else if(item.children && item.children.length > 0){
-                        arr.push(item.deptId)
+                        arr.push(item.dept_id)
                         fun(item.children)
                     }
                     bg++
                     if(out) return
                     if(bg===p.length&&arr&&arr.length>0){
-                        arr = [0]
+                        arr = []
                     }
                 }      
             }
             fun(p)
+            console.log(arr)
             return arr
         },
         /**
@@ -174,6 +210,8 @@ export default {
                     send.phone = this.dataForm.phone
                     send.gender = this.dataForm.gender
                     send.roleId = this.dataForm.roleId
+                    send.deptName = this.dataForm.deptName
+                    send.deptId = this.dataForm.deptId[this.dataForm.deptId.length-1]
                     send.remark = this.dataForm.remark||''
                     Params.send = send
                     sendServer(Params,this).then(

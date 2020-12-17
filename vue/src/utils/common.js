@@ -8,7 +8,7 @@ let cfg = require("./../config/casher.function.js");
 let des = require('./des.js');
 let util = require('./util.js');
 let axios = require('axios');
-
+import Cookies from "js-cookie";
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter,asyncRoutes } from '@/router'
 import ElementUI from 'element-ui';
@@ -39,7 +39,7 @@ const sendServer = (urlParams, me) => {
     let params = {};
     let rc = "", sign = "";
     if(urlParams.url!=='/f/userAction/mobileLogin'){
-        urlParams.send.token = 'admin'
+        urlParams.send.token = Cookies.get('token')
     }
     params = urlParams.send;
     // if (params.TxnId !== cfg.service.getLoginId.txnId) {
@@ -77,6 +77,9 @@ const sendServer = (urlParams, me) => {
             // console.log(res)
             if (res.status === 200) {
                 if(res.data.code===123){
+                    if(res.data.msg==='其他用户正在使用本账户'){
+                        me.loading = false
+                    }
                     ElementUI.Message({
                         message: res.data.msg,
                         type: 'error'
@@ -84,6 +87,7 @@ const sendServer = (urlParams, me) => {
                     window.localStorage.clear()
                     removeToken()
                     resetRouter()
+                    Cookies.remove('token');
                     store.commit('user/SET_NAME','')
                     me.$router.push({ path:'/login'})
                 }else{

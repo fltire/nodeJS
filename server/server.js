@@ -67,7 +67,6 @@ async function userdata(data1){
 //登录
 async function mobileLogin(data1){
     let data = {
-        token:'123',
         name:'樊文',
     }
     let s =await c(`SELECT * from user where user_name like '${data1.userName}' and password like '${data1.password}'`)
@@ -93,6 +92,7 @@ async function mobileLogin(data1){
         }
         data.permissions = permissions
         data.routers = routers
+        data.token = data1.userName
     }
     let date = new Date().getTime()
     if(s.length!==0){
@@ -370,7 +370,7 @@ async function getUserData(data){
     }
     
     let list = s.map((item)=>{
-        return {userId:item.user_id,userName:item.user_name,roleId:item.role_id,nickName:item.nick_name,phone:item.phone,userCreate:item.user_create,gender:item.gender,remark:item.remark,userModified:item.user_modified}
+        return {userId:item.user_id,userName:item.user_name,roleId:item.role_id,nickName:item.nick_name,phone:item.phone,userCreate:item.user_create,gender:item.gender,remark:item.remark,userModified:item.user_modified,deptId:item.dept_id,deptName:item.dept_name}
     })
     return {
         code: 0,
@@ -390,7 +390,7 @@ async function addUser(data){
             msg:'用户名称重复'
         }
     }
-    let d = await c(`insert into user (user_name,nick_name,phone,gender,remark,user_create,password,role_id) values ('${data.userName}','${data.nickName}','${data.phone}','${data.gender}','${data.remark}','${data.time}','123456','${data.roleId}');`)
+    let d = await c(`insert into user (user_name,nick_name,phone,gender,remark,user_create,password,role_id,dept_id,dept_name) values ('${data.userName}','${data.nickName}','${data.phone}','${data.gender}','${data.remark}','${data.time}','123456','${data.roleId}','${data.deptId}','${data.deptName}');`)
     console.log(d)
     if(d.insertId){
         return {
@@ -423,7 +423,7 @@ async function delUser(data){
 // 修改用户
 async function uptUser(data){
     console.log(data)
-    let s = await c(`update user set user_name = '${data.userName}',nick_name = '${data.nickName}',phone = '${data.phone}',gender = '${data.gender}',remark = '${data.remark}',role_id = '${data.roleId}',user_modified = '${data.time}' where user_id = ${data.userId}`)
+    let s = await c(`update user set user_name = '${data.userName}',nick_name = '${data.nickName}',phone = '${data.phone}',gender = '${data.gender}',remark = '${data.remark}',role_id = '${data.roleId}',dept_id = '${data.deptId}',dept_name = '${data.deptName}',user_modified = '${data.time}' where user_id = ${data.userId}`)
     console.log(s)
     if(s.affectedRows===1){
         return {
@@ -537,7 +537,7 @@ async function getRoleById(data){
     let role = await c(`select menu_id from role_menu where role_id ='${data.roleId}'`)
     for(let item = 0 ;item<role.length;item++){
         let menu = await c(`select * from menu where menu_id ='${role[item].menu_id}'`)
-        if(menu[0].menu_type==='F'){
+        if(menu[0].son==='N'){
             permissions.push(menu[0].menu_id)
         }
     }
@@ -785,6 +785,39 @@ async function delDept(data){
         }
     }
 }
+// 退出登录
+async function logout(data){
+    await c(`delete from token where token = '${data.token}'`)
+    return {
+        code:0,
+        msg:'退出成功'
+    }
+}
+// 新增用户时返回部门表
+async function getUserDept(data){
+    s = await c(`SELECT * from dept order by dept_id desc`)
+    const cloneData = JSON.parse(JSON.stringify(s))
+    const treeData = cloneData.filter(father => {
+        let branchArr = cloneData.filter(child => {
+            return father.dept_id === child.parent_id
+        });
+        branchArr.sort((a,b)=>{
+            return a.order_num > b.order_num ? 1 : -1
+        })
+        branchArr.length > 0 ? father.children = branchArr : '';
+        return father.parent_id === 0;
+    });
+    treeData.sort((a,b)=>{
+        return a.order_num > b.order_num ? 1 : -1
+    })
+    return {
+        code:0,
+        msg:1,
+        data:{
+            list:treeData
+        }
+    }
+}
 exports.server = async function(url,data){
     var sql
     let date = new Date().getTime()
@@ -819,6 +852,9 @@ exports.server = async function(url,data){
         //     return mobileLogin(data)
         //     break;
             // 商品列表
+        case '/f/logout':
+            return logout(data);
+            break;
         case '/f/goodsAction/goodsQry':
             return goodsQry(data)
             break;
@@ -959,9 +995,14 @@ exports.server = async function(url,data){
         case '/f/dept/delDept':
             return delDept(data)
             break;
+            //  通过角色id查找
         case '/f/role/getRoleById':
             return getRoleById(data)
             break;
+            // 新增用户时返回角色信息
+        case '/f/user/getUserDept':
+            return getUserDept(data)
+            break
 
     }
     // return c(sql)

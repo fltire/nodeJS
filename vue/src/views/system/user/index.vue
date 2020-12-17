@@ -26,7 +26,7 @@
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="userName" label="用户名称"></el-table-column>
             <el-table-column prop="nickName" label="用户昵称"></el-table-column>
-            <el-table-column prop="date" label="部门"></el-table-column>
+            <el-table-column prop="deptName" label="部门"></el-table-column>
             <el-table-column prop="phone" label="手机号码"></el-table-column>
             <el-table-column prop="userCreate" label="创建时间"></el-table-column>
             <el-table-column align="center" label="操作">

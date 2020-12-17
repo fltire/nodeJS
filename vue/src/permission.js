@@ -7,6 +7,7 @@ import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 import {handleRoute} from '@/utils/qx'
 import Layout from '@/layout'
+import Cookies from "js-cookie";
 import {sendServer} from './utils/common'
 NProgress.configure({ showSpinner: false }) // 进度条配置
 const whiteList = ['/login'] // no redirect whitelist
@@ -16,7 +17,7 @@ router.beforeEach(async(to, from, next) => {
   // 网页标题
   document.title = getPageTitle(to.meta.title)
   // 确定用户是否已经登录
-  const hasToken = getToken()
+  const hasToken = Cookies.get('token')
   // console.log(hasToken)
   if (hasToken) {
     if (to.path === '/login') {

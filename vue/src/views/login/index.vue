@@ -28,6 +28,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import { validUsername } from '@/utils/validate'
 import {sendServer} from '../../utils/common'
 import {funcMap2List} from '../../utils/qx'
+import Cookies from "js-cookie";
 export default {
   name: 'Login',
   data() {
@@ -88,19 +89,21 @@ export default {
           Params.send = send
             sendServer(Params,this).then(
               (res)=>{
+                this.loading = false
                 console.log(res)
                 if(res.code!==0){
                   this.$message.error('登陆失败');
                 }else{
-                  setToken('123')
                   // localStorage.setItem('userdata',JSON.stringify(res))
                   // localStorage.setItem('routers',JSON.stringify(res.data.arr))
                   // localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   // setToken(res.token)
+                  Cookies.set('token',res.data.token)
                   localStorage.setItem('userdata',JSON.stringify(res))
                   localStorage.setItem('routers',JSON.stringify(res.data.routers))
                   localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   this.$router.push({ path:'/'})
+                  console.log('12121')
                 }
                 this.loading = false
                 

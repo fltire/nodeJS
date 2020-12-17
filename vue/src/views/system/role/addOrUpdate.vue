@@ -10,7 +10,7 @@
                     <el-tree
                         :data="tree"
                         show-checkbox
-                        node-key="menuId"
+                        node-key="menu_id"
                         ref="tree"
                         highlight-current
                         :default-checked-keys='keys'
@@ -38,8 +38,8 @@ export default {
             tree: [],
             defaultProps: {
                 children: 'children',
-                label: 'menuName',
-                value:'menuId'
+                label: 'menu_name',
+                value:'menu_id'
                 // label: 'menu_name',
                 // value:'menu_id'
             },

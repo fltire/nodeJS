@@ -29,6 +29,7 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import {sendServer} from '../../utils/common'
+import Cookies from "js-cookie";
 export default {
   components: {
     Breadcrumb,
@@ -46,13 +47,21 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-
+      let Params = {},
+          send = {}
+      Params.url = '/f/logout'
+      Params.send = send
+      sendServer(Params,this).then(
+        (res)=>{
+          Cookies.remove('token');
           window.localStorage.clear()
           localStorage.removeItem('rou')
           localStorage.removeItem('userdata')
           localStorage.removeItem('jurisdiction')
-
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+          this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+        },(res)=>{
+        }
+      )
     }
   }
 }
@@ -78,12 +87,10 @@ export default {
       background: rgba(0, 0, 0, .025)
     }
   }
-
   .breadcrumb-container {
     float: left;
     line-height:46px;
   }
-
   .right-menu {
     float: right;
     height: 100%;
@@ -92,7 +99,6 @@ export default {
     &:focus {
       outline: none;
     }
-
     .right-menu-item {
       display: inline-block;
       padding: 0 8px;
