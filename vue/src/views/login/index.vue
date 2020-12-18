@@ -99,7 +99,7 @@ export default {
                   // localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   // setToken(res.token)
                   Cookies.set('token',res.data.token)
-                  localStorage.setItem('userdata',JSON.stringify(res))
+                  localStorage.setItem('userdata',JSON.stringify(res.data))
                   localStorage.setItem('routers',JSON.stringify(res.data.routers))
                   localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   this.$router.push({ path:'/'})

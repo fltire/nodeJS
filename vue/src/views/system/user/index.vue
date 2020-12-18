@@ -18,7 +18,7 @@
                     <el-button @click="getUserData">查询</el-button>
                 </el-form-item>
             </el-form>
-            <el-button v-if="$isPermissions('user:add')" type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate">新增</el-button>
+            <el-button v-if="$isPermissions('user:add')" type="primary" size="mini" icon="el-icon-plus" @click="addOrUpdate()">新增</el-button>
             <el-button v-if="$isPermissions('user:upt')" type="success" size="mini" icon="el-icon-edit-outline" @click="addOrUpdate(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
             <el-button v-if="$isPermissions('user:del')" type="danger" size="mini" icon="el-icon-delete" @click="delUser()" :disabled='multipleSelection.length===0'>删除</el-button>
         </div>
@@ -42,8 +42,6 @@
             :total="count"
             @current-change=currentChange>
         </el-pagination>
-
-
         <add-or-update ref="aou" @getUserData="getUserData"></add-or-update>
     </div>
 </template>

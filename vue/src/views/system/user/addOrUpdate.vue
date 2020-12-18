@@ -22,7 +22,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="部门" prop="deptId" style="float:left;width:50%" >
-                    <el-cascader ref="deptTree" @change='getDept' :options="options" v-model="dataForm.deptId" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>
+                    <el-cascader :disabled="deptId!==''" ref="deptTree" @change='getDept' :options="options" v-model="dataForm.deptId" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark" style="float:left;width:100%">
                     <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="dataForm.remark"></el-input>
@@ -42,6 +42,7 @@ export default {
     data() {
         return {
             dialogVisible: false,
+            deptId:[],
             dataForm: {
                 userName: '',
                 nickName: '',
@@ -126,9 +127,15 @@ export default {
             this.dataForm.deptId = null
             this.dataForm.deptName = ''
             this.getRole()
+            this.deptId = ''
+            if(JSON.parse(localStorage.getItem('userdata')).deptId!==null){
+                this.deptId = JSON.parse(localStorage.getItem('userdata')).deptId
+                this.dataForm.deptId = this.echo(JSON.parse(localStorage.getItem('userdata')).deptId)
+            }
             // this.$refs.dataForm.resetFields();
             this.id = ''
             if(data!==''){
+                console.log(1212)
                 this.id = data.userId
                 this.dataForm.userName = data.userName
                 this.dataForm.nickName = data.nickName
@@ -168,7 +175,7 @@ export default {
                 }      
             }
             fun(p)
-            console.log(arr)
+            
             return arr
         },
         /**

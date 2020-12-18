@@ -67,7 +67,6 @@ async function userdata(data1){
 //登录
 async function mobileLogin(data1){
     let data = {
-        name:'樊文',
     }
     let s =await c(`SELECT * from user where user_name like '${data1.userName}' and password like '${data1.password}'`)
     let jurisdiction = null
@@ -93,6 +92,8 @@ async function mobileLogin(data1){
         data.permissions = permissions
         data.routers = routers
         data.token = data1.userName
+        data.name = s[0].user_name
+        data.deptId = s[0].dept_id
     }
     let date = new Date().getTime()
     if(s.length!==0){
@@ -108,18 +109,20 @@ async function mobileLogin(data1){
 }
 //商品列表
 async function goodsQry(data){
-    let s = await c('SELECT * from goods order by id desc;')
-    let list = s.slice(10*(data.page-1),10*data.page)
-    if(list.length===0){
-        list = s.slice(10*(data.page-2),10*(data.page-1))
-    } 
+    let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
+    let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
+    let list = s.map((item)=>{
+        return {goodsId:item.goods_id,goodsName:item.goods_name,goodsTypeName:item.goods_type_name,goodsRetailPrice:item.goods_retail_price,goodsStock:item.goods_stock,goodsCreate:item.goods_create,goodsModified:item.goods_modified,deptId:item.dept_id,goodsTypeId:item.goods_type_id}
+    })
     return {
         code: 20000,
         data: {
-            AllCount:s.length,
+            AllCount:length[0]['count(*)'],
             goodsList:list
         }
     }
+
 }
 //桌台列表
 async function tableSync(data){
@@ -148,17 +151,9 @@ async function tableUse(data){
 }
 //商品新增
 async function goodsAdd(data){
-    let date = new Date()
-    console.log(date)
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-    const second = date.getSeconds()
-    let p = `${year}-${month}-${day} ${hour}:${minute}:${second}`
-    console.log(p)
-    let s = await c(`insert into goods (GoodsName,GoodsTypeName,GoodsTypeId,GoodsRetailPrice,GoodsStock,GoodsAddDate,GoodsUnit) values ('${data.GoodsName}','${data.GoodsTypeName}','${data.GoodsTypeId}','${data.GoodsRetailPrice}','${data.GoodsStock}','${p}','${data.GoodsUnit}');`)
+    let dept = await c(`select * from user where user_name like '${data.token}'`)
+    console.log('data',data)
+    let s = await c(`insert into goods (goods_name,goods_type_name,goods_retail_price,goods_stock,goods_create,dept_id,goods_type_id) values ('${data.goodsName}','${data.goodsTypeName}','${data.goodsRetailPrice}','${data.goodsStock}','${data.time}','${dept[0].dept_id}','${data.goodsTypeId}');`)
     return {
         data: '新增成功'
     }
@@ -180,7 +175,7 @@ async function goodsDel(data){
 }
 //商品修改
 async function goodsUpt(data){
-    let sql = `update goods set GoodsName = '${data.GoodsName}',GoodsTypeName = '${data.GoodsTypeName}',GoodsTypeId = '${data.GoodsTypeId}',GoodsRetailPrice = '${data.GoodsRetailPrice}',GoodsStock = '${data.GoodsStock}',GoodsUnit = '${data.GoodsUnit}' where id = ${data.id}`
+    let sql = `update goods set goods_name = '${data.goodsName}',goods_type_name = '${data.goodsTypeName}',goods_retail_price = '${data.goodsRetailPrice}',goods_stock = '${data.goodsStock}',goods_modified = '${data.time}',goods_type_id = '${data.goodsTypeId}' where goods_id = ${data.goodsId}`
     let s = await c(sql)
     return {
         data:'修改成功'
@@ -360,15 +355,18 @@ async function getUserData(data){
             }
         }   
     }
+    let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
+
     if(key.length===0){
-        s = await c(`SELECT * from user order by user_id desc limit ${(data.page-1)*10},10;`)
-        length = await c(`select  count(*) from user`)
+        s = await c(`SELECT * from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+        console.log(`SELECT * from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+        console.log(`select  count(*) from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+        length = await c(`select  count(*) from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
     }else{
-       s = await c(`Select * from user where ${value.join(' and ')} order by user_id desc limit ${(data.page-1)*10},10;`)
-       console.log(`Select * from user where ${value.join(' and ')} order by user_id desc limit ${(data.page-1)*10},10`)
-       length = await c(`select  count(*) from user where ${value.join(' and ')} order by user_id desc `)
+       s = await c(`Select * from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+       console.log(`Select * from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+       length = await c(`select  count(*) from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc `)
     }
-    
     let list = s.map((item)=>{
         return {userId:item.user_id,userName:item.user_name,roleId:item.role_id,nickName:item.nick_name,phone:item.phone,userCreate:item.user_create,gender:item.gender,remark:item.remark,userModified:item.user_modified,deptId:item.dept_id,deptName:item.dept_name}
     })
@@ -440,8 +438,15 @@ async function uptUser(data){
 // 新增用户时角色下拉框
 async function getRoleList(data){
     let s = await c(`SELECT role_id,role_name from role order by role_id desc;`)
-    let list = s.map((item) => {
-        return {roleId:item.role_id,roleName:item.role_name}
+    let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
+    console.log('dept',dept)
+    let list = []
+    s.forEach((item) => {
+        if(dept[0].dept_id==null){
+            list.push({roleId:item.role_id,roleName:item.role_name})
+        }else if(item.role_id!='1'){
+            list.push({roleId:item.role_id,roleName:item.role_name})
+        }
     })
     return {
         code:0,
@@ -766,10 +771,17 @@ async function uptDept(data){
 async function delDept(data){
     let yuanPId = await c(`SELECT parent_id from dept where dept_id like '${data.deptId}'`)
     let p = await c(`SELECT dept_name from dept where parent_id like '${data.deptId}'`)
+    let user = await c(`SELECT * from user where dept_id like '${data.deptId}'`)
+
     if(p.length!==0){
         return{
             code:1,
             msg:'此菜单有子节点，不能删除'
+        }
+    }else if(user.length!==0){
+        return {
+            code: 1,
+            msg:'本部门下有账户，不能删除'
         }
     }else{
         await c(`delete from dept where dept_id = ${data.deptId}`)
@@ -827,7 +839,6 @@ exports.server = async function(url,data){
             return mobileLogin(data)
         }else if(date-s[0].time>1800000){
             await c(`delete from token where token = '${data.userName}'`)
-            
             return mobileLogin(data)
         }else{
             return{

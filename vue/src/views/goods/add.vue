@@ -3,23 +3,18 @@
     <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
         <el-form ref="form" :model="formData" label-width="80px">
             <el-form-item label="商品名称">
-                <el-input v-model="formData.GoodsName" placeholder="商品名称"></el-input>
+                <el-input v-model="formData.goodsName" placeholder="商品名称"></el-input>
             </el-form-item>
             <el-form-item label="商品类型">
-                <el-select @change='chengeType' ref="types" v-model="formData.GoodsTypeId" placeholder="商品类型" style="width:100%">
+                <el-select @change='chengeType' ref="types" v-model="formData.goodsTypeId" placeholder="商品类型" style="width:100%">
                     <el-option v-for="item in GoodsTypes" :label="item.type" :value="item.id" :key="item.id"></el-option>
-                    <!-- <el-option label="区域二" value="beijing"></el-option> -->
                 </el-select>
-                <!-- <el-input v-model="formData.GoodsTypeName" placeholder="商品类型"></el-input> -->
             </el-form-item>
             <el-form-item label="零售价">
-                <el-input type="number"  v-model="formData.GoodsRetailPrice" placeholder="零售价"></el-input>
-            </el-form-item>
-            <el-form-item label="单位">
-                <el-input v-model="formData.GoodsUnit" placeholder="单位"></el-input>
+                <el-input type="number"  v-model="formData.goodsRetailPrice" placeholder="零售价"></el-input>
             </el-form-item>
             <el-form-item label="库存">
-                <el-input type="number" v-model="formData.GoodsStock" placeholder="库存"></el-input>
+                <el-input type="number" v-model="formData.goodsStock" placeholder="库存"></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -44,13 +39,12 @@ import {sendServer} from '../../utils/common'
             {type:'家具类',id:5},
         ],
         formData:{
-            GoodsName:'',
-            GoodsTypeId:'',
-            GoodsTypeName:'',
-            GoodsRetailPrice:'',
-            GoodsUnit:'',
-            GoodsStock:'',
-            GoodsAddDate:''
+            goodsName:'',
+            goodsTypeId:'',
+            goodsTypeName:'',
+            goodsRetailPrice:'',
+            goodsStock:'',
+            goodsCreate:''
         },
         id:null
       };
@@ -59,26 +53,24 @@ import {sendServer} from '../../utils/common'
       init(e){
         this.id=null
         this.dialogVisible = true
-        this.formData.GoodsName = ''
-        this.formData.GoodsTypeId = ''
-        this.formData.GoodsTypeName = ''
-        this.formData.GoodsRetailPrice = ''
-        this.formData.GoodsUnit = ''
-        this.formData.GoodsStock = ''
+        this.formData.goodsName = ''
+        this.formData.goodsTypeId = ''
+        this.formData.goodsTypeName = ''
+        this.formData.goodsRetailPrice = ''
+        this.formData.gGoodsStock = ''
         if(e){
-            this.id = e.id
-            this.formData.GoodsName = e.GoodsName
-            this.formData.GoodsTypeId = e.GoodsTypeId
-            this.formData.GoodsTypeName = e.GoodsTypeName
-            this.formData.GoodsRetailPrice = e.GoodsRetailPrice
-            this.formData.GoodsUnit = e.GoodsUnit
-            this.formData.GoodsStock = e.GoodsStock
+            this.id = e.goodsId
+            this.formData.goodsName = e.goodsName
+            this.formData.goodsTypeId = e.goodsTypeId
+            this.formData.goodsTypeName = e.goodsTypeName
+            this.formData.goodsRetailPrice = e.goodsRetailPrice
+            this.formData.goodsStock = e.goodsStock
         }
       },
       chengeType(e){
           setTimeout(() => {
               console.log(this.$refs.types.selectedLabel)
-              this.formData.GoodsTypeName = this.$refs.types.selectedLabel
+              this.formData.goodsTypeName = this.$refs.types.selectedLabel
           }, 20);
       },
       AddorUpdate(){
@@ -86,7 +78,7 @@ import {sendServer} from '../../utils/common'
         let send = this.formData
         Params.url = this.id?'/f/goodsAction/goodsUpt':'/f/goodsAction/goodsAdd'
         if(this.id){
-            send.id = this.id
+            send.goodsId = this.id
         }
         Params.send = send
         sendServer(Params,this).then(

@@ -6,11 +6,11 @@
     </div>
     <el-table v-loading="listLoading" :data="list" element-loading-text="Loading" border fit highlight-current-row>
       <!-- <el-table-column prop="GoodsId" align="center" label="商品id" width="95"></el-table-column> -->
-      <el-table-column prop="GoodsName" align="center" label="商品名称" ></el-table-column>
-      <el-table-column prop="GoodsTypeName" align="center" label="类型" ></el-table-column>
-      <el-table-column prop="GoodsRetailPrice" align="center" label="零售价"></el-table-column>
-      <el-table-column prop="GoodsStock" align="center" label="库存" ></el-table-column>
-      <el-table-column prop="GoodsAddDate" align="center" label="商品添加时间"></el-table-column>
+      <el-table-column prop="goodsName" align="center" label="商品名称" ></el-table-column>
+      <el-table-column prop="goodsTypeName" align="center" label="类型" ></el-table-column>
+      <el-table-column prop="goodsRetailPrice" align="center" label="零售价"></el-table-column>
+      <el-table-column prop="goodsStock" align="center" label="库存" ></el-table-column>
+      <el-table-column prop="goodsCreate" align="center" label="商品添加时间"></el-table-column>
       <el-table-column align="center" label="操作">
           <template slot-scope="scope">
               <el-button size="mini"  type="danger" @click="goodsDel(scope.row.id)"  v-if="$isPermissions('goods:del')">删除</el-button>
