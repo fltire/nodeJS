@@ -1,23 +1,44 @@
 <template>
   <div class="app-container">
-    <div style="padding:20px">
-        <!-- <el-button type="primary" v-if="$store.state.role.spxz" @click="goodsAdd">添加商品</el-button> -->
-        <el-button type="primary"  @click="goodsAdd" v-if="$isPermissions('goods:add')">添加商品</el-button>
+    <div>
+      <el-form :model="dataForm" :inline="true" size="small" label-width="80px" class="demo-ruleForm" style="overflow:hidden">
+        <el-form-item label="商品名称">
+          <el-input v-model="dataForm.goods_name" clearable placeholder="请输入用户名称"></el-input>
+        </el-form-item>
+        <el-form-item v-if="deptId===null" label="部门">
+          <el-cascader ref="deptTree" :options="options" v-model="dataForm.dept_id" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>
+        </el-form-item>
+        <el-form-item label="商品类型">
+          <el-select ref="types" v-model="dataForm.goods_type_id" placeholder="商品类型" style="width:100%">
+            <el-option v-for="item in GoodsTypes" :label="item.type" :value="item.id" :key="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="reset">重置</el-button>
+          <el-button @click="fetchData">查询</el-button>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-table v-loading="listLoading" :data="list" element-loading-text="Loading" border fit highlight-current-row>
-      <!-- <el-table-column prop="GoodsId" align="center" label="商品id" width="95"></el-table-column> -->
+    <div style="padding-bottom:20px">
+      <el-button v-if="$isPermissions('goods:add')" type="primary" size="mini" icon="el-icon-plus" @click="goodsAdd()">新增</el-button>
+      <el-button v-if="$isPermissions('goods:upt')" type="success" size="mini" icon="el-icon-edit-outline" @click="goodsAdd(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
+      <el-button v-if="$isPermissions('goods:del')" type="danger" size="mini" icon="el-icon-delete" @click="goodsDel()" :disabled='multipleSelection.length===0'>删除</el-button>
+        <!-- <el-button type="primary" v-if="$store.state.role.spxz" @click="goodsAdd">添加商品</el-button> -->
+    </div>
+    <el-table v-loading="listLoading" :data="list" @selection-change="handleSelectionChange" :header-cell-style="{background:'#f8f8f9'}" element-loading-text="Loading">
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="goodsName" align="center" label="商品名称" ></el-table-column>
       <el-table-column prop="goodsTypeName" align="center" label="类型" ></el-table-column>
       <el-table-column prop="goodsRetailPrice" align="center" label="零售价"></el-table-column>
       <el-table-column prop="goodsStock" align="center" label="库存" ></el-table-column>
       <el-table-column prop="goodsCreate" align="center" label="商品添加时间"></el-table-column>
       <el-table-column align="center" label="操作">
-          <template slot-scope="scope">
-              <el-button size="mini"  type="danger" @click="goodsDel(scope.row.id)"  v-if="$isPermissions('goods:del')">删除</el-button>
-              <el-button size="mini"  @click="goodsAdd(scope.row)"  v-if="$isPermissions('goods:upt')">修改</el-button>
-              <!-- <el-button size="mini" v-if="$store.state.role.spsc" type="danger" @click="goodsDel(scope.row.id)">删除</el-button>
-              <el-button size="mini" v-if="$store.state.role.spxg" @click="goodsAdd(scope.row)">修改</el-button> -->
-          </template>
+        <template slot-scope="scope">
+          <el-button size="mini" type="text" @click="goodsDel(scope.row.goodsId)"  v-if="$isPermissions('goods:del')"><i class="el-icon-edit-outline"></i>删除</el-button>
+          <el-button size="mini" type="text" @click="goodsAdd(scope.row)"  v-if="$isPermissions('goods:upt')"><i class="el-icon-delete"></i>修改</el-button>
+          <!-- <el-button size="mini" v-if="$store.state.role.spsc" type="danger" @click="goodsDel(scope.row.id)">删除</el-button>
+          <el-button size="mini" v-if="$store.state.role.spxg" @click="goodsAdd(scope.row)">修改</el-button> -->
+        </template>
       </el-table-column>
     </el-table>
     <el-pagination background layout="prev, pager, next" :total="AllCount" :current-page=page @current-change='currentChange'></el-pagination>
@@ -44,7 +65,26 @@ export default {
       list: null,
       listLoading: true,
       AllCount:null,
+      deptId:null,
+      multipleSelection: [],
       page:1,
+      dataForm: {
+        goods_type_id: '',
+        dept_id: '',
+        goods_name: '',
+      },
+      GoodsTypes:[
+        {type:'食品类',id:1},
+        {type:'服装类',id:2},
+        {type:'鞋帽类',id:3},
+        {type:'日用品类',id:4},
+        {type:'家具类',id:5},
+      ],
+      options: [],
+      props:{
+          value: 'dept_id',
+          label: 'dept_name'
+      },
     }
   },
   components:{
@@ -54,48 +94,104 @@ export default {
     this.fetchData()
   },
   mounted () {
-    
+    this.deptId = JSON.parse(localStorage.getItem('userdata')).deptId
+    this.getUserDept()
   },
   methods: {
+    getUserDept(){
+      let Params = {},
+        send = {}
+      Params.url = '/f/user/getUserDept'
+      Params.send = send
+      sendServer(Params,this).then(
+        (res)=>{
+          console.log(res)
+          if(res.code===0){
+            this.options = res.data.list
+          }
+        }
+      )
+    },
+    /**
+     * 清空条件查询，并刷新数据
+     */
+    reset(){
+      this.dataForm.goods_type_id = ''
+      this.dataForm.dept_id = ''
+      this.dataForm.goods_name = ''
+      this.fetchData()
+    },
+    /**
+     * 新增/修改时刷新列表
+     */
     AddorUpdate(){
         this.page = 1
         this.fetchData()
     },
-    // 新增
+    /**
+     * 新增/修改
+     * @method goodsAdd
+     * @param {object} e 修改时携带的参数
+     */
     goodsAdd(e){
         this.$refs.add.init(e)
     },
-    //删除
-    goodsDel(e){
+    /**
+     * 删除
+     * @method goodsDel
+     * @param {number} id 单个删除时的id
+     */
+    goodsDel(id){
+        let arr = id? [id] : this.multipleSelection.map(item => {
+            return item.goodsId
+        })
         this.$confirm('确认删除？')
           .then(_ => {
-            console.log(e)
+            console.log(id)
             let Params = {}
             let send = {}
             Params.url = '/f/goodsAction/goodsDel'
-            send.id = e
+            send.ids = arr
             Params.send = send
-            let _that = this
             sendServer(Params,this).then(
-                (res)=>{
+              (res)=>{
                 console.log(res.data)
-                this.$message({
-                    message: res.data,
+                if(res.code===0){
+                  this.$message({
+                    message: res.msg,
                     type: 'success'
-                });
-                _that.fetchData()
-                },(res)=>{
+                  });
+                  this.fetchData()
                 }
+              },(res)=>{
+              }
             )
           })
-          .catch(_ => {});
+          .catch(_ => {
+            console.log(122)
+          });
     },
-    //分页
+    /**
+     * 多选
+     * @method handleSelectionChange
+     * @param {array} val 选中的数据集合
+     */
+    handleSelectionChange(val) {
+        this.multipleSelection = val;
+    },
+    /**
+     * 分页
+     * @method currentChange
+     * @param {number} e 跳转到的页数
+     */
     currentChange(e){
         this.page = e
         this.fetchData()
     },
-    //列表
+    /**
+     * 商品列表
+     * @method fetchData
+     */
     fetchData() {
       if(this.$isPermissions('goods:query')){
         this.listLoading = true
@@ -103,16 +199,20 @@ export default {
         let send = {}
         Params.url = '/f/goodsAction/goodsQry'
         send.page = this.page
+        send.goods_type_id = this.dataForm.goods_type_id
+        send.dept_id = this.dataForm.dept_id[this.dataForm.dept_id.length-1]
+        send.goods_name = this.dataForm.goods_name
         Params.send = send
-        let _that = this
         sendServer(Params,this).then(
             (res)=>{
-            console.log(res)
-            _that.list = res.data.goodsList
-            _that.AllCount = res.data.AllCount
-            _that.listLoading = false
+              console.log(res)
+              if(res.code===0){
+                this.list = res.data.goodsList
+                this.AllCount = res.data.AllCount
+              }
+              this.listLoading = false
             },(res)=>{
-            _that.listLoading = false
+              this.listLoading = false
             }
         )
       }

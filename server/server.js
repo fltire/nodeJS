@@ -110,19 +110,32 @@ async function mobileLogin(data1){
 //商品列表
 async function goodsQry(data){
     let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
-    let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
-    let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
+    let key = [],value = [],s,length
+    for(let item in data){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
+            key.push(item)
+            value.push(`${item} like '%${data[item]}%'`)
+        }
+    }
+    if(key.length===0){
+        s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
+        length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    }else{
+        s = await c(`Select * from goods where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
+       length = await c(`select  count(*) from goods where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by goods_id desc `)
+    }
+    // let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    // let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
     let list = s.map((item)=>{
         return {goodsId:item.goods_id,goodsName:item.goods_name,goodsTypeName:item.goods_type_name,goodsRetailPrice:item.goods_retail_price,goodsStock:item.goods_stock,goodsCreate:item.goods_create,goodsModified:item.goods_modified,deptId:item.dept_id,goodsTypeId:item.goods_type_id}
     })
     return {
-        code: 20000,
+        code: 0,
         data: {
             AllCount:length[0]['count(*)'],
             goodsList:list
         }
     }
-
 }
 //桌台列表
 async function tableSync(data){
@@ -152,7 +165,7 @@ async function tableUse(data){
 //商品新增
 async function goodsAdd(data){
     let dept = await c(`select * from user where user_name like '${data.token}'`)
-    console.log('data',data)
+    console.log('dept',dept)
     let s = await c(`insert into goods (goods_name,goods_type_name,goods_retail_price,goods_stock,goods_create,dept_id,goods_type_id) values ('${data.goodsName}','${data.goodsTypeName}','${data.goodsRetailPrice}','${data.goodsStock}','${data.time}','${dept[0].dept_id}','${data.goodsTypeId}');`)
     return {
         data: '新增成功'
@@ -167,10 +180,18 @@ async function tableAdd(data){
 }
 //商品删除
 async function goodsDel(data){
-    let s = await c(`delete from goods where id = ${data.id}`)
-    console.log('data',data)
-    return {
-        data: '删除成功'
+    let s = await c(`delete from goods where goods_id in (${data.ids.join(',')})`)
+    console.log(s)
+    if(s.affectedRows!==0){
+        return {
+            code:0,
+            msg:'删除成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'删除失败'
+        }
     }
 }
 //商品修改

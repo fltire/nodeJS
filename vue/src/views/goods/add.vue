@@ -57,7 +57,7 @@ import {sendServer} from '../../utils/common'
         this.formData.goodsTypeId = ''
         this.formData.goodsTypeName = ''
         this.formData.goodsRetailPrice = ''
-        this.formData.gGoodsStock = ''
+        this.formData.goodsStock = ''
         if(e){
             this.id = e.goodsId
             this.formData.goodsName = e.goodsName
