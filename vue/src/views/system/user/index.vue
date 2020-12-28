@@ -31,8 +31,8 @@
             <el-table-column prop="userCreate" label="创建时间"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button v-if="$isPermissions('user:upt')" size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
-                    <el-button v-if="$isPermissions('user:del')" size="mini" type="text" @click="delUser(scope.row.userId)"><i class="el-icon-delete"></i>删除</el-button>
+                    <el-button v-if="$isPermissions('user:upt')&&scope.row.userId!==1" size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
+                    <el-button v-if="$isPermissions('user:del')&&scope.row.userId!==1" size="mini" type="text" @click="delUser(scope.row.userId)"><i class="el-icon-delete"></i>删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -107,10 +107,10 @@ export default {
          * 清空条件查询，并刷新数据
          */
         reset(){
-                this.dataForm.userName = ''
-                this.dataForm.gender = ''
-                this.dataForm.phone = ''
-                this.getUserData()
+            this.dataForm.userName = ''
+            this.dataForm.gender = ''
+            this.dataForm.phone = ''
+            this.getUserData()
         },
         /**
          * 新增或修改

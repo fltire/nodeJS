@@ -851,10 +851,150 @@ async function getUserDept(data){
         }
     }
 }
+// 字典分类列表
+async function getDictType(data){
+    s = await c(`SELECT * from dict_type order by dict_type_id desc`)
+    let list = s.map((item)=>{
+        return {dictTypeId:item.dict_type_id,dictTypeName:item.dict_type_name,dictTypeCreate:item.dict_type_create,dictTypeModified:item.dict_type_modified,remark:item.remark}
+    })
+    return {
+        code:0,
+        msg:'查询成功',
+        data:{
+            list:list
+        }
+    }
+}
+// 字典分类新增
+async function addDictType(data){
+    let d = await c(`insert into dict_type (dict_type_name,dict_type_create,remark) values ('${data.dictTypeName}','${data.time}','${data.remark}');`)
+    if(d.insertId){
+        return {
+            code:0,
+            msg:'新增成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'新增失败'
+        }
+    }
+}
+// 字典分类修改
+async function uptDictType(data){
+    let s1 = await c(`update dict_type set dict_type_name = '${data.dictTypeName}',remark = '${data.remark}',dict_type_modified = '${data.time}' where dict_type_id = ${data.dictTypeId}`)
+    if(s1.affectedRows===1){
+        return {
+            code:0,
+            msg:'修改成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'修改失败'
+        }
+    }
+}
+// 字典分类删除
+async function delDictType(data){
+    let p = await c(`SELECT * from dict where dict_type_id like '${data.dictTypeId}'`)
+    if(p.length!==0){
+        return {
+            code:1,
+            msg:'删除失败，该分类下有数据'
+        }
+    }else{
+        let a = await c(`delete from dict_type where dict_type_id = ${data.dictTypeId}`)
+        return {
+            code:0,
+            msg:'删除成功'
+        }
+    }
+}
+// 字典列表
+async function getDict(data){
+    let s = ''
+    let key = [],value = [],length
+    for(let item in data){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
+            key.push(item)
+            if(item==='dictName'){
+                value.push(`dict_name like '%${data[item]}%'`)
+            }else if(item==='dictTypeId'){
+                value.push(`dict_type_id like '%${data[item]}%'`)
+            }
+        }   
+    }
+    console.log(`Select * from dict ${key.length===0?'':'where'} ${value.join(' and ')} order by dict_id desc limit ${(data.page-1)*10},10;`)
+    s = await c(`Select * from dict ${key.length===0?'':'where'} ${value.join(' and ')} order by dict_id desc limit ${(data.page-1)*10},10;`)
+    length = await c(`select  count(*) from dict ${key.length===0?'':'where'} ${value.join(' and ')} order by dict_id desc `)
+    let list = []
+    for(let i = 0; i<s.length; i++){
+        let type = await c(`select dict_type_name from dict_type where dict_type_id = ${s[i].dict_type_id}`)
+        list.push({dictId:s[i].dict_id,dictName:s[i].dict_name,dictTypeId:s[i].dict_type_id,dictCreate:s[i].dict_create,dictModified:s[i].dict_modified,remark:s[i].remark,dictTypeName:type[0].dict_type_name})
+    }
+    return {
+        code: 0,
+        data: {
+            count:length[0]['count(*)'],
+            list:list
+        }
+    }
+}
+// 字典新增
+async function addDict(data){
+    let d = await c(`insert into dict (dict_name,dict_create,remark,dict_type_id) values ('${data.dictName}','${data.time}','${data.remark}','${data.dictTypeId}');`)
+    if(d.insertId){
+        return {
+            code:0,
+            msg:'新增成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'新增失败'
+        }
+    }
+}
+// 字典修改
+async function uptDict(data){
+    let s1 = await c(`update dict set dict_name = '${data.dictName}',remark = '${data.remark}',dict_modified = '${data.time}',dict_type_id = '${data.dictTypeId}' where dict_id = ${data.dictId}`)
+    if(s1.affectedRows===1){
+        return {
+            code:0,
+            msg:'修改成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'修改失败'
+        }
+    }
+}
+// 字典删除
+async function delDict(data){
+    let a = await c(`delete from dict where dict_id in (${data.ids.join(',')})`)
+    return {
+        code:0,
+        msg:'删除成功'
+    }
+}
 exports.server = async function(url,data){
     var sql
     let date = new Date().getTime()
-    if(url==='/f/userAction/mobileLogin'){
+    if(url==='/f/abcd'){
+        s = await c(`SELECT * from menu order by menu_id desc`)
+        let list = s.map((item)=>{
+            return {menuId:item.menu_id,menuName:item.menu_name,parentId:item.parent_id,path:item.path,component:item.component,menuType:item.menu_type,menuCreate:item.menu_create,menuModified:item.menu_modified,remark:item.remark,orderNum:item.order_num,icon:item.icon,son:item.son,perms:item.perms}
+        })
+        return {
+            code:0,
+            msg:'查询成功',
+            data:{
+                list:list
+            }
+        }
+    }else if(url==='/f/userAction/mobileLogin'){
         let s = await c(`select * from token where token ='${data.userName}'`)
         if(s.length===0){
             return mobileLogin(data)
@@ -1035,7 +1175,38 @@ exports.server = async function(url,data){
         case '/f/user/getUserDept':
             return getUserDept(data)
             break
-
+            // 字典分类列表
+        case '/f/dictType/getDictType':
+            return getDictType(data)
+            break
+            // 字典分类新增
+        case '/f/dictType/addDictType':
+            return addDictType(data)
+            break
+            // 字典分类修改
+        case '/f/dictType/uptDictType':
+            return uptDictType(data)
+            break
+            // 字典分类删除
+        case '/f/dictType/delDictType':
+            return delDictType(data)
+            break
+            // 字典列表
+        case '/f/dict/getDict':
+            return getDict(data)
+            break
+            // 字典新增
+        case '/f/dict/addDict':
+            return addDict(data)
+            break
+            // 字典修改
+        case '/f/dict/uptDict':
+            return uptDict(data)
+            break
+            // 字典删除
+        case '/f/dict/delDict':
+            return delDict(data)
+            break
     }
     // return c(sql)
 }

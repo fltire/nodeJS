@@ -11,7 +11,7 @@
             <el-table-column prop="roleCreate" label="创建时间"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" v-if="$isPermissions('role:upt')&&scope.row.roleId!='1'" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
+                    <el-button size="mini" type="text" v-if="$isPermissions('role:upt')" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
                     <el-button size="mini" type="text" v-if="$isPermissions('role:del')&&scope.row.roleId!='1'" @click="delRole(scope.row.roleId)"><i class="el-icon-delete"></i>删除</el-button>
                 </template>
             </el-table-column>

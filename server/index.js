@@ -1,7 +1,7 @@
 var http = require('http');
 var {server} = require('./server')
 http.createServer(async function(req,res){
-    res.setHeader('access-control-allow-origin', '*');
+    // res.setHeader('access-control-allow-origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type');
     res.writeHead(200, {'Content-Type': 'utf-8'});
     var body = ''
