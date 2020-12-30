@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog :title="id?'修改':'新增'" :visible.sync="dialogVisible" width="800px" >
+        <el-dialog :title="id?'部门修改':'部门新增'" :visible.sync="dialogVisible" width="800px" >
         <el-form :model="dataForm" :rules="rules" ref="dataForm" label-width="100px" class="menuForm demo-ruleForm" style="overflow:hidden">
             <el-form-item label="上级部门" prop="parentId" style="width:50%;float:left">
                 <el-cascader :key="isResouceShow" :options="options" v-model="dataForm.parentId" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>

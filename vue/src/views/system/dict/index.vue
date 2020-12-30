@@ -42,6 +42,12 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="count"
+            @current-change=currentChange>
+        </el-pagination>
     </div>
 
     <add-or-update ref="AOU" :dictType='tree' @getDict='getDict'></add-or-update>
@@ -64,6 +70,7 @@ export default {
                 dictName:'',
                 dictTypeId:''
             },
+            count: null,
             dataList:[],
             list: [],
             page: 1,
@@ -99,6 +106,17 @@ export default {
             this.dataForm.dictTypeId = ''
             this.dataForm.dictName = ''
             this.getDict()
+        },
+        /**
+         * 分页点击事件
+         * @method currenChange
+         * @param {number} e 点击的分页，要跳转到的页码
+         */
+        currentChange(e){
+            if(this.page!==e){
+                this.page=e
+                this.getDict()
+            }
         },
         /**
          * 字典分类列表
@@ -146,6 +164,7 @@ export default {
                     if(res.code===0){
                         console.log(res)
                         this.list  = res.data.list
+                        this.count = res.data.count
                         this.listLoading = false
                     }
                 },(res)=>{
@@ -333,7 +352,7 @@ export default {
 }
 .right{
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     // background: chocolate;
 }
 .right-main {

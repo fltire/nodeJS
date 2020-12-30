@@ -1,23 +1,15 @@
 <template>
     <div>
-        <el-dialog title="新增" :visible.sync="dialogVisible" width="800px" >
+        <el-dialog :title="id?'角色修改':'角色新增'" :visible.sync="dialogVisible" width="800px" >
         <el-form :model="dataForm" :rules="rules" ref="dataForm"  label-width="100px" class="demo-ruleForm" >
                 <el-form-item label="角色名称" prop="roleName" >
                     <el-input v-model="dataForm.roleName" ></el-input>
                 </el-form-item>
                 <el-form-item label="权限" prop="quanxian">
                     <el-checkbox v-model="checked" @change='checkedChange'>全选/全不选</el-checkbox>
-                    <el-tree
-                        :data="tree"
-                        show-checkbox
-                        node-key="menu_id"
-                        ref="tree"
-                        highlight-current
-                        :default-checked-keys='keys'
-                        :props="defaultProps"
-                        default-expand-all
-                        >
-                    </el-tree>
+                    <div style="height:400px;overflow:auto">
+                        <el-tree :data="tree" show-checkbox node-key="menu_id" ref="tree" highlight-current :default-checked-keys='keys' :props="defaultProps" default-expand-all></el-tree>
+                    </div>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

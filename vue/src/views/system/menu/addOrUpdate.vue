@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog :title="id?'修改':'新增'" :visible.sync="dialogVisible" width="800px" >
+        <el-dialog :title="id?'菜单修改':'菜单新增'" :visible.sync="dialogVisible" width="800px" >
         <el-form :model="dataForm" :rules="rules" ref="dataForm" label-width="100px" class="menuForm demo-ruleForm" style="overflow:hidden">
             <el-form-item label="菜单类型" prop="menuType" >
                 <el-radio-group :disabled='id?true:false' @change="changeRadio" v-model="dataForm.menuType">

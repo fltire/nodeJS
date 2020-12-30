@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog title="新增" :visible.sync="dialogVisible" width="800px" >
+        <el-dialog :title="id?'用户修改':'用户新增'" :visible.sync="dialogVisible" width="800px" >
            <el-form :model="dataForm" ref="dataForm" :rules="rules" label-width="100px" class="demo-ruleForm" style="overflow:hidden">
                 <el-form-item label="用户名称" prop="userName" style="width:50%;float:left">
                     <el-input v-model="dataForm.userName" ></el-input>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog title="新增" :visible.sync="dialogVisible" width="50" >
+        <el-dialog :title="id?'字典修改':'字典新增'" :visible.sync="dialogVisible" width="50" >
         <el-form :model="dataForm" :rules="rules" ref="dataForm"  label-width="100px" class="demo-ruleForm" >
                 <el-form-item label="分类" prop="dictTypeId" >
                     <el-select v-model="dataForm.dictTypeId" placeholder="请选择" style="width:100%">

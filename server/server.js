@@ -126,9 +126,12 @@ async function goodsQry(data){
     }
     // let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
     // let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
-    let list = s.map((item)=>{
-        return {goodsId:item.goods_id,goodsName:item.goods_name,goodsTypeName:item.goods_type_name,goodsRetailPrice:item.goods_retail_price,goodsStock:item.goods_stock,goodsCreate:item.goods_create,goodsModified:item.goods_modified,deptId:item.dept_id,goodsTypeId:item.goods_type_id}
-    })
+    let list = []
+    for(let i=0; i<s.length;i++){
+        let d = await c(`select dict_name from dict where dict_id = ${s[i].goods_type_id}`)
+        let b = await c(`select dept_name from dept where dept_id = ${s[i].dept_id}`)
+        list.push({goodsId:s[i].goods_id,goodsName:s[i].goods_name,goodsTypeName:d[0].dict_name,goodsRetailPrice:s[i].goods_retail_price,goodsStock:s[i].goods_stock,goodsCreate:s[i].goods_create,goodsModified:s[i].goods_modified,deptId:s[i].dept_id,goodsTypeId:s[i].goods_type_id,deptName:b[0].dept_name})
+    }
     return {
         code: 0,
         data: {
@@ -979,6 +982,22 @@ async function delDict(data){
         msg:'删除成功'
     }
 }
+// 商品-商品类型
+async function getGoodsType(data){
+    s = await c(`Select * from dict where dict_type_id = 3 order by dict_id ;`)
+    console.log(s)
+    let list = []
+    s.forEach(item =>{
+        list.push({dictId:item.dict_id,dictName:item.dict_name})
+    })
+    return {
+        code:0,
+        msg:1,
+        data:{
+            list
+        }
+    }
+}
 exports.server = async function(url,data){
     var sql
     let date = new Date().getTime()
@@ -1206,6 +1225,9 @@ exports.server = async function(url,data){
             // 字典删除
         case '/f/dict/delDict':
             return delDict(data)
+            break
+        case '/f/goods/getGoodsType':
+            return getGoodsType(data)
             break
     }
     // return c(sql)

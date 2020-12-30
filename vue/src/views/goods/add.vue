@@ -1,13 +1,13 @@
 <template>
 <div>
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+    <el-dialog :title="id?'商品修改':'商品新增'" :visible.sync="dialogVisible" width="50%">
         <el-form ref="form" :model="formData" label-width="80px">
             <el-form-item label="商品名称">
                 <el-input v-model="formData.goodsName" placeholder="商品名称"></el-input>
             </el-form-item>
             <el-form-item label="商品类型">
                 <el-select @change='chengeType' ref="types" v-model="formData.goodsTypeId" placeholder="商品类型" style="width:100%">
-                    <el-option v-for="item in GoodsTypes" :label="item.type" :value="item.id" :key="item.id"></el-option>
+                    <el-option v-for="item in GoodsTypes" :label="item.dictName" :value="item.dictId" :key="item.dictId"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="零售价">
@@ -31,13 +31,6 @@ import {sendServer} from '../../utils/common'
     data() {
       return {
         dialogVisible: false,
-        GoodsTypes:[
-            {type:'食品类',id:1},
-            {type:'服装类',id:2},
-            {type:'鞋帽类',id:3},
-            {type:'日用品类',id:4},
-            {type:'家具类',id:5},
-        ],
         formData:{
             goodsName:'',
             goodsTypeId:'',
@@ -49,6 +42,7 @@ import {sendServer} from '../../utils/common'
         id:null
       };
     },
+    props: ['GoodsTypes'],
     methods: {
       init(e){
         this.id=null

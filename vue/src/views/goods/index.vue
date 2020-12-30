@@ -10,7 +10,7 @@
         </el-form-item>
         <el-form-item label="商品类型">
           <el-select ref="types" v-model="dataForm.goods_type_id" placeholder="商品类型" style="width:100%">
-            <el-option v-for="item in GoodsTypes" :label="item.type" :value="item.id" :key="item.id"></el-option>
+            <el-option v-for="item in GoodsTypes" :label="item.dictName" :value="item.dictId" :key="item.dictId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -31,8 +31,9 @@
       <el-table-column prop="goodsTypeName" align="center" label="类型" ></el-table-column>
       <el-table-column prop="goodsRetailPrice" align="center" label="零售价"></el-table-column>
       <el-table-column prop="goodsStock" align="center" label="库存" ></el-table-column>
+      <el-table-column v-if="deptId===null" prop="deptName" align="center" label="部门" ></el-table-column>
       <el-table-column prop="goodsCreate" align="center" label="商品添加时间"></el-table-column>
-      <el-table-column align="center" label="操作">
+      <el-table-column align="center" label="操作" v-if="$isPermissions('goods:del')||$isPermissions('goods:upt')">
         <template slot-scope="scope">
           <el-button size="mini" type="text" @click="goodsDel(scope.row.goodsId)"  v-if="$isPermissions('goods:del')"><i class="el-icon-edit-outline"></i>删除</el-button>
           <el-button size="mini" type="text" @click="goodsAdd(scope.row)"  v-if="$isPermissions('goods:upt')"><i class="el-icon-delete"></i>修改</el-button>
@@ -42,7 +43,7 @@
       </el-table-column>
     </el-table>
     <el-pagination background layout="prev, pager, next" :total="AllCount" :current-page=page @current-change='currentChange'></el-pagination>
-    <add ref="add" @AddorUpdate = 'AddorUpdate'></add>
+    <add ref="add" :GoodsTypes='GoodsTypes' @AddorUpdate = 'AddorUpdate'></add>
   </div>
 </template>
 <script>
@@ -74,11 +75,6 @@ export default {
         goods_name: '',
       },
       GoodsTypes:[
-        {type:'食品类',id:1},
-        {type:'服装类',id:2},
-        {type:'鞋帽类',id:3},
-        {type:'日用品类',id:4},
-        {type:'家具类',id:5},
       ],
       options: [],
       props:{
@@ -96,8 +92,23 @@ export default {
   mounted () {
     this.deptId = JSON.parse(localStorage.getItem('userdata')).deptId
     this.getUserDept()
+    this.getGoodsType()
   },
   methods: {
+    getGoodsType(){
+      let Params = {},
+        send = {}
+      Params.url = '/f/goods/getGoodsType'
+      Params.send = send
+      sendServer(Params,this).then(
+        (res)=>{
+          console.log(res)
+          if(res.code===0){
+            this.GoodsTypes = res.data.list
+          }
+        }
+      )
+    },
     getUserDept(){
       let Params = {},
         send = {}
