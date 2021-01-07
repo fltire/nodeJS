@@ -6,6 +6,9 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  provide:{
+    for:"demo"
+  }
 }
 </script>

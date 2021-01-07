@@ -370,27 +370,73 @@ async function getUserData(data){
     let s = ''
     let key = [],value = [],length
     for(let item in data){
-        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
-            key.push(item)
-            if(item==='userName'){
-                value.push(`user_name like '%${data[item]}%'`)
-            }else{
-                value.push(`${item} like '%${data[item]}%'`)
+        if(data[item]!==''){
+            switch(item){
+                case 'userName':
+                    key.push(item);
+                    value.push(`user_name like '%${data[item]}%'`);
+                    break;
+                case 'gender':
+                    key.push(item);
+                    value.push(`gender like '${data[item]}'`);
+                    break;
+                case 'phone':
+                    key.push(item);
+                    value.push(`phone like '%${data[item]}%'`);
+                    break;
+
+                default:
+                    break
             }
         }   
     }
+    // let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
+    // let deptmap = []
+    // if(dept[0].dept_id === null){
+    //     if(data.deptId!==''){
+    //         let deptid = await c(`SELECT * from dept where parent_id like '${data.deptId}'`)
+    //         if(deptid.length !== 0){
+    //             deptmap = deptid.map(item => {
+    //                 return item.dept_id
+    //             })
+    //         }
+    //     }
+    // }
     let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
-
-    if(key.length===0){
-        s = await c(`SELECT * from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
-        console.log(`SELECT * from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
-        console.log(`select  count(*) from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
-        length = await c(`select  count(*) from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    let deptStr = '';
+    if(dept[0].dept_id === null){
+        // 是超级管理员身份
+        if(data.deptId === ''){
+            // 没选择部门
+        }else{
+            // 选择部门
+            let deptid = await c(`SELECT * from dept where parent_id like '${data.deptId}'`)
+            if(deptid.length === 0){
+                // 部门就是最底层
+                deptStr+='dept_id like '+data.deptId
+            }else{
+                // 部门不是最底层
+                let arr = []
+                deptid.forEach(item => {
+                    arr.push('dept_id like '+item.dept_id)
+                })
+                deptStr = arr.join(' OR ')
+            }
+        }
     }else{
-       s = await c(`Select * from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
-       console.log(`Select * from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
-       length = await c(`select  count(*) from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc `)
+        // 不是超级管理员
+        deptStr +='dept_id like '+dept[0].dept_id
     }
+    // console.log(`Select * from user ${deptStr!=='' || value.length!==0 ? 'where '+value.join(' and ')+(value.length!==0&&deptStr!==''?' and ':'')+' '+deptStr :''} order by user_id desc limit ${(data.page-1)*10},10;`)
+    s = await c(`Select * from user ${deptStr!=='' || value.length!==0 ? 'where '+value.join(' and ')+(value.length!==0&&deptStr!==''?' and ':'')+' '+deptStr :''} order by user_id desc limit ${(data.page-1)*10},10;`)
+    length = await c(`select  count(*) from user ${deptStr!=='' || value.length!==0 ? 'where '+value.join(' and ')+(value.length!==0&&deptStr!==''?' and ':'')+' '+deptStr :''}`)
+    // if(key.length===0){
+    //     s = await c(`SELECT * from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+    //     length = await c(`select  count(*) from user ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    // }else{
+    //    s = await c(`Select * from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc limit ${(data.page-1)*10},10;`)
+    //    length = await c(`select  count(*) from user where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by user_id desc `)
+    // }
     let list = s.map((item)=>{
         return {userId:item.user_id,userName:item.user_name,roleId:item.role_id,nickName:item.nick_name,phone:item.phone,userCreate:item.user_create,gender:item.gender,remark:item.remark,userModified:item.user_modified,deptId:item.dept_id,deptName:item.dept_name}
     })
@@ -412,8 +458,8 @@ async function addUser(data){
             msg:'用户名称重复'
         }
     }
-    let d = await c(`insert into user (user_name,nick_name,phone,gender,remark,user_create,password,role_id,dept_id,dept_name) values ('${data.userName}','${data.nickName}','${data.phone}','${data.gender}','${data.remark}','${data.time}','123456','${data.roleId}','${data.deptId}','${data.deptName}');`)
-    console.log(d)
+    console.log(`insert into user (user_name,nick_name,phone,gender,remark,user_create,password,role_id,dept_id,dept_name) values ('${data.userName}','${data.nickName}','${data.phone}','${data.gender}','${data.remark}','${data.time}','123456','${data.roleId}',${data.deptId},'${data.deptName}');`)
+    let d = await c(`insert into user (user_name,nick_name,phone,gender,remark,user_create,password,role_id,dept_id,dept_name) values ('${data.userName}','${data.nickName}','${data.phone}','${data.gender}','${data.remark}','${data.time}','123456','${data.roleId}',${data.deptId},'${data.deptName}');`)
     if(d.insertId){
         return {
             code:0,

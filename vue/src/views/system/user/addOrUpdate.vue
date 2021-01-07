@@ -21,7 +21,7 @@
                         <el-option v-for="item in roleList" :key="item.roleName" :label="item.roleName" :value="item.roleId"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="部门" prop="deptId" style="float:left;width:50%" >
+                <el-form-item v-show="dataForm.roleId!=1" label="部门" :prop="dataForm.roleId==1?'deptIdaas':'deptId'" style="float:left;width:50%" >
                     <el-cascader :disabled="deptId!==''" ref="deptTree" @change='getDept' :options="options" v-model="dataForm.deptId" filterable :show-all-levels='false' :props="props" clearable style="width:100%"></el-cascader>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark" style="float:left;width:100%">
@@ -218,7 +218,7 @@ export default {
                     send.gender = this.dataForm.gender
                     send.roleId = this.dataForm.roleId
                     send.deptName = this.dataForm.deptName
-                    send.deptId = this.dataForm.deptId[this.dataForm.deptId.length-1]
+                    send.deptId = this.dataForm.deptId ? this.dataForm.deptId[this.dataForm.deptId.length-1] :null
                     send.remark = this.dataForm.remark||''
                     Params.send = send
                     sendServer(Params,this).then(

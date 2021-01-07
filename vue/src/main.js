@@ -20,6 +20,7 @@ import {isPermissions} from '@/utils/qx'
 Vue.prototype.$echarts = echarts
 Vue.prototype.$utils = utils
 Vue.prototype.$isPermissions = isPermissions
+console.log(Vue.utli)
 
 /**
  * If you don't want to use mock-server
