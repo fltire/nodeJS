@@ -21,7 +21,7 @@ export default {
             let p = {name:e.name,path:e.path}
             let s = 0
             for(let i=0;i<this.route.length;i++){
-                if(JSON.stringify(this.route[i])===JSON.stringify(p)){
+                if(this.route[i].path===p.path){
                     s++
                 }
             }

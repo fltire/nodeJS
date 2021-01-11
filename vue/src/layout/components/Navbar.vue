@@ -10,7 +10,7 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="my">
+          <router-link :to="{ path: '/my/my'}">
             <el-dropdown-item>
               个人中心
             </el-dropdown-item>
