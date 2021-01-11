@@ -94,6 +94,7 @@ async function mobileLogin(data1){
         data.token = data1.userName
         data.name = s[0].user_name
         data.deptId = s[0].dept_id
+        data.userId = s[0].user_id
     }
     let date = new Date().getTime()
     if(s.length!==0){
@@ -1044,6 +1045,72 @@ async function getGoodsType(data){
         }
     }
 }
+// 个人信息
+async function details(data){
+    let s = await c(`select * from user where user_id = ${data.userId}`)
+    let role = await c(`select * from role where role_id = ${s[0].role_id}`) 
+    let dept = await c(`select * from dept where dept_id = ${s[0].dept_id}`) 
+    let details = {
+        userName:s[0].user_name,nickName:s[0].nick_name,phone:s[0].phone,userCreate:s[0].user_create,remark:s[0].remark,role:role[0].role_name,dept:dept.length!==0?dept[0].dept_name:'',gender:s[0].gender
+    }
+    return {
+        code:0,
+        data:details
+    }
+}
+// 修改个人基础信息
+async function myUptData (data) {
+    let s = await c(`update user set nick_name = '${data.nickName}',phone = '${data.phone}',gender = '${data.gender}' where user_id = ${data.userId}`)
+    if(s.affectedRows===1){
+        return {
+            code:0,
+            msg:'修改成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'修改失败'
+        }
+    }
+}
+// 修改个人密码
+async function uptpsd(data){
+    let s = await c(`select password from user where user_id = ${data.userId}`)
+    if(s[0].password!==data.oldpsd){
+        return {
+            code:1,
+            msg:"原密码错误，不能修改"
+        }
+    }else{
+        let p = await c(`update user set password = '${data.newpsd}' where user_id = ${data.userId}`)
+        if(p.affectedRows===1){
+            return {
+                code:0,
+                msg:'修改成功'
+            }
+        }else{
+            return {
+                code:1,
+                msg:'修改失败'
+            }
+        }
+    }
+}
+// 重置密码
+async function resetPassword(data){
+    let s = await c(`update user set password = '123456' where user_id = ${data.id}`)
+    if(s.affectedRows===1){
+        return {
+            code:0,
+            msg:'修改成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'修改失败'
+        }
+    }
+}
 exports.server = async function(url,data){
     var sql
     let date = new Date().getTime()
@@ -1272,8 +1339,25 @@ exports.server = async function(url,data){
         case '/f/dict/delDict':
             return delDict(data)
             break
+            // 商品分类
         case '/f/goods/getGoodsType':
             return getGoodsType(data)
+            break
+            // 个人中心详细信息
+        case '/f/my/details':
+            return details(data)
+            break
+            // 修改个人基础信息
+        case '/f/my/myUptData':
+            return myUptData(data)
+            break
+            // 修改个人密码
+        case '/f/my/uptpsd':
+            return uptpsd(data)
+            break
+            // 重置密码
+        case '/f/user/resetPassword':
+            return resetPassword(data)
             break
     }
     // return c(sql)

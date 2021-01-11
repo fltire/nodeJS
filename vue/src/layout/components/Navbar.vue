@@ -10,9 +10,9 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
+          <router-link to="my">
             <el-dropdown-item>
-              我的
+              个人中心
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">

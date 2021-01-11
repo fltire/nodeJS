@@ -54,6 +54,18 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'home' }
     }]
   },
+  {
+    path: '/my',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: '个人中心',
+        component: () => import('@/views/my/index'),
+        meta: { title: '个人中心', icon: 'goods' }
+      }
+    ]
+  },
   // {
   //   path: '/',
   //   component: Layout,

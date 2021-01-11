@@ -37,6 +37,7 @@
                     <template slot-scope="scope">
                         <el-button v-if="$isPermissions('user:upt')&&scope.row.userId!==1" size="mini" type="text" @click="addOrUpdate(scope.row)" ><i class="el-icon-edit-outline"></i>修改</el-button>
                         <el-button v-if="$isPermissions('user:del')&&scope.row.userId!==1" size="mini" type="text" @click="delUser(scope.row.userId)"><i class="el-icon-delete"></i>删除</el-button>
+                        <el-button v-if="$isPermissions('user:resetPassword')&&scope.row.userId!==1" size="mini" type="text" @click="resetPassword(scope.row.userId)"><i class="el-icon-unlock"></i>重置密码</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -136,6 +137,43 @@ export default {
           (res) => {}
         );
       }
+    },
+    /**
+     * 重置密码
+     * @method resetPassword
+     * @param {number} e 要重置的用户的id
+     */
+    resetPassword(e){
+      this.$confirm("确定重置该用户的密码?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+      .then(() => {
+        let Params = {},
+          send = {};
+        Params.url = "/f/user/resetPassword";
+        // Params.url = '/Servlet/deleteuser'
+        send.id = e;
+        Params.send = send;
+        sendServer(Params, this).then(
+          (res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: "success",
+                message: "重置成功",
+              });
+            }
+          },
+          (res) => {}
+        );
+      })
+      .catch(() => {
+        this.$message({
+          type: "info",
+          message: "已取消重置",
+        });
+      });
     },
     /**
      * 清空条件查询，并刷新数据
