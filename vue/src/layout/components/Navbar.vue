@@ -58,7 +58,7 @@ export default {
           localStorage.removeItem('rou')
           localStorage.removeItem('userdata')
           localStorage.removeItem('jurisdiction')
-          this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+          this.$router.push(`/login`)
         },(res)=>{
         }
       )

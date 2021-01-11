@@ -77,13 +77,19 @@ import {sendServer} from '../../utils/common'
         Params.send = send
         sendServer(Params,this).then(
             (res)=>{
-                console.log(res.data)
-                this.$message({
-                    message: res.data,
-                    type: 'success'
-                });
-                this.dialogVisible = false
-                this.$emit('AddorUpdate')
+                if(res.code === 0){
+                    this.$message({
+                        message: res.msg,
+                        type: 'success'
+                    });
+                    this.dialogVisible = false
+                    this.$emit('AddorUpdate')
+                }else{
+                    this.$message({
+                        message: res.msg,
+                        type: 'error'
+                    });
+                }
             },(res)=>{
             }
         )

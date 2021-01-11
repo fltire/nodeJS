@@ -103,7 +103,6 @@ export default {
                   localStorage.setItem('routers',JSON.stringify(res.data.routers))
                   localStorage.setItem('permissions',JSON.stringify(res.data.permissions))
                   this.$router.push({ path:'/'})
-                  console.log('12121')
                 }
                 this.loading = false
                 

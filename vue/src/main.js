@@ -14,7 +14,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
-import echarts from 'echarts'
+var echarts = require('echarts');
 import utils from '@/utils/public'
 import {isPermissions} from '@/utils/qx'
 Vue.prototype.$echarts = echarts

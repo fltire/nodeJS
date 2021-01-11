@@ -170,9 +170,17 @@ async function tableUse(data){
 async function goodsAdd(data){
     let dept = await c(`select * from user where user_name like '${data.token}'`)
     console.log('dept',dept)
+    let name = await c(`select * from goods where dept_id = ${dept[0].dept_id} and goods_name = '${data.goodsName}'`)
+    if(name.length!=0){
+        return {
+            code:1,
+            msg:"已有同名商品，不可增加同名商品"
+        }
+    }
     let s = await c(`insert into goods (goods_name,goods_type_name,goods_retail_price,goods_stock,goods_create,dept_id,goods_type_id) values ('${data.goodsName}','${data.goodsTypeName}','${data.goodsRetailPrice}','${data.goodsStock}','${data.time}','${dept[0].dept_id}','${data.goodsTypeId}');`)
     return {
-        data: '新增成功'
+        code:0,
+        msg: '新增成功'
     }
 }
 //桌台新增
@@ -203,7 +211,8 @@ async function goodsUpt(data){
     let sql = `update goods set goods_name = '${data.goodsName}',goods_type_name = '${data.goodsTypeName}',goods_retail_price = '${data.goodsRetailPrice}',goods_stock = '${data.goodsStock}',goods_modified = '${data.time}',goods_type_id = '${data.goodsTypeId}' where goods_id = ${data.goodsId}`
     let s = await c(sql)
     return {
-        data:'修改成功'
+        code:0,
+        msg:'修改成功'
     }
 }
 // 台桌停用
@@ -1111,6 +1120,28 @@ async function resetPassword(data){
         }
     }
 }
+// 首页echarts数据
+async function echarts(data){
+    let dept = await c(`select * from user where user_id = ${data.userId}`)
+    let goods = await c(`select *  from goods ${dept[0].dept_id==null?'':'where dept_id = '+dept[0].dept_id}`)
+    let goodsNum = [] // 数量饼图
+    let goodsPrice = [] // 价格
+    let goodsName = [] // 名字
+    goods.forEach(item=>{
+        goodsNum.push({value:item.goods_stock,name:item.goods_name})
+        goodsPrice.push(item.goods_retail_price)
+        goodsName.push(item.goods_name)
+    })
+    return{
+        code:0,
+        msg:1,
+        data:{
+            goodsNum,
+            goodsPrice,
+            goodsName
+        }
+    }
+}
 exports.server = async function(url,data){
     var sql
     let date = new Date().getTime()
@@ -1358,6 +1389,9 @@ exports.server = async function(url,data){
             // 重置密码
         case '/f/user/resetPassword':
             return resetPassword(data)
+            break
+        case '/f/home/echarts':
+            return echarts(data)
             break
     }
     // return c(sql)

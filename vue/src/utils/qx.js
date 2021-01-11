@@ -58,25 +58,11 @@ const List2funcMap = function (list){
     return arr.join('')
 }
 function handleRoute(){
-    // console.log(JSON.parse(localStorage.getItem(routers)))
-    // return paixu(JSON.parse(localStorage.getItem(routers)))
-return new Promise(rrr =>{
-    let list = paixu(JSON.parse(localStorage.getItem('routers')))
-    rrr(list)
-    // let Params = {},
-    // send = {}
-    // Params.url = '/f/menu/getMenu'
-    // Params.send = send
-    // sendServer(Params,this).then(
-    //     (res)=>{
-    //         console.log(res)
-    //         let list = paixu(res.data.list)
-    //         // let list = xiugai(res.data.list)
-    //         rrr(list)
-    //     },(res)=>{
-    //     }
-    //     )
-    })
+    console.log(1122344342)
+    return new Promise(rrr =>{
+        let list = paixu(JSON.parse(localStorage.getItem('routers')))
+            rrr(list)
+        })
 }
 function paixu(list){
     let cloneList = JSON.parse(JSON.stringify(list))
