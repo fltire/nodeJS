@@ -95,6 +95,7 @@ async function mobileLogin(data1){
         data.name = s[0].user_name
         data.deptId = s[0].dept_id
         data.userId = s[0].user_id
+        data.img = s[0].img
     }
     let date = new Date().getTime()
     if(s.length!==0){
@@ -1060,7 +1061,7 @@ async function details(data){
     let role = await c(`select * from role where role_id = ${s[0].role_id}`) 
     let dept = await c(`select * from dept where dept_id = ${s[0].dept_id}`) 
     let details = {
-        userName:s[0].user_name,nickName:s[0].nick_name,phone:s[0].phone,userCreate:s[0].user_create,remark:s[0].remark,role:role[0].role_name,dept:dept.length!==0?dept[0].dept_name:'',gender:s[0].gender
+        userName:s[0].user_name,nickName:s[0].nick_name,phone:s[0].phone,userCreate:s[0].user_create,remark:s[0].remark,role:role[0].role_name,dept:dept.length!==0?dept[0].dept_name:'',gender:s[0].gender,img:s[0].img
     }
     return {
         code:0,
@@ -1142,7 +1143,7 @@ async function echarts(data){
         }
     }
 }
-exports.server = async function(url,data){
+exports.server = async function(url,data,res){
     var sql
     let date = new Date().getTime()
     if(url==='/f/abcd'){
@@ -1390,9 +1391,11 @@ exports.server = async function(url,data){
         case '/f/user/resetPassword':
             return resetPassword(data)
             break
+            // echarts图
         case '/f/home/echarts':
             return echarts(data)
             break
+
     }
     // return c(sql)
 }

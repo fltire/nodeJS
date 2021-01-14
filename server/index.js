@@ -17,7 +17,7 @@ http.createServer(async function(req,res){
         if(req.method=='POST'){
           console.log(req.url)
           console.log(body)
-            let  s = await server(req.url,body)
+            let  s = await server(req.url,body,res)
             // console.log(s,'34');
             res.write(JSON.stringify(s));
             res.end();
