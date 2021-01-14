@@ -2,6 +2,22 @@
     <div>
         <div class="left">
             <el-card class="box-card " header="个人信息" style="width:100%">
+                <div style="overflow:hidden;text-align:center">
+                    <el-upload
+                        class="img-p"
+                        ref='upload'
+                        :auto-upload='false' 
+                        :multiple='false'
+                        :limit="1"
+                        accept="image/jpeg,image/gif,image/png"
+                        action=''
+                        :show-file-list='false'
+                        :on-change='uploadFiles'
+                        >
+                        <img v-if="imageUrl" :src="imageUrl" title="点击修改头像" class="avatar img">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                </div>
                 <div class="left-item"><svg-icon icon-class="user"></svg-icon> 用户昵称<span class="left-span">{{data.nickName}}</span></div>
                 <div class="left-item"><svg-icon icon-class="phone"></svg-icon> 手机号码<span class="left-span">{{data.phone}}</span></div>
                 <div class="left-item"><svg-icon icon-class="tree"></svg-icon> 所属部门<span class="left-span">{{data.dept}}</span></div>
@@ -50,18 +66,39 @@
                 </el-tabs>
             </el-card>
         </div>
+
+        <!-- <el-button @click='uploadFiles' size="mini" type="primary">点击上传</el-button> -->
+        <!-- <el-upload
+            ref='upload'
+            :auto-upload='false' 
+            :file-list="fileList" 
+            :multiple='false'
+            :limit="1"
+            :on-exceed="handleExceed"
+            :http-request="uploadFiles" 
+            accept="image/jpeg,image/gif,image/png"
+            action=''
+            :on-change='changeUpload'           
+            >
+            <el-button slot="trigger" size="mini" type="primary">选取图片</el-button>
+            <el-button @click='uploadFiles' size="mini" type="primary">点击上传</el-button>
+        </el-upload>     -->
+
     </div>
 </template>
 <script>
 import {sendServer} from '../../utils/common';
 import {isPhone} from '../../utils/util';
 import Cookies from "js-cookie";
+import Axios from 'axios';
 export default {
     data () {
         return {
             userId: null,
             data : "",
+            img:'',
             activeName:'基本资料',
+            imageUrl: '',
             dataForm:{
                 nickName:'',
                 phone:'',
@@ -107,6 +144,32 @@ export default {
         this.details()
     },
     methods: {
+        //点击上传图片,上传成功返回图片路径 
+        uploadFiles(){
+            console.log(123)
+            var That=this;
+            let file=this.$refs.upload.$refs['upload-inner'].$refs.input; //获取文件数据
+            let fileList=file.files;      
+            var imgFile;
+            let reader = new FileReader();     //html5读文件 
+            reader.readAsDataURL(fileList[0]); //转BASE64       
+            console.log(reader)
+            reader.onload = function(e){
+                Axios({
+                    method: 'post',
+                    url:process.env.VUE_APP_BASE_API+'/upload',
+                    data: {
+                        imgData:e.target.result,
+                        userId:That.userId
+                    }
+                }).then((res)=>{
+                    console.log(res.data)
+                    That.imageUrl = 'http://127.0.0.1:8083/'+res.data.img
+                    // That.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
+                    That.$refs.upload.clearFiles()
+                })
+            }
+        },
         /**
          * 获取用户详细信息
          * @method details
@@ -125,6 +188,9 @@ export default {
                         this.dataForm.nickName = res.data.nickName
                         this.dataForm.phone = res.data.phone
                         this.dataForm.gender = res.data.gender
+                        this.imageUrl = 'http://127.0.0.1:8083/'+res.data.img
+                        // this.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
+                        this.img = res.data.img
                     }
                 },(res)=>{
                 }
@@ -247,6 +313,19 @@ export default {
     }
 }
 </script>
+<style >
+/* .img-p .el-upload{
+        display: block;
+    text-align: center;
+    cursor: pointer;
+    outline: 0;
+    margin: 0 auto;
+    
+}
+.img-p .el-upload:hover{
+    background: chartreuse;
+} */
+</style>
 <style scoped>
 
 .left{
@@ -268,4 +347,11 @@ export default {
     width: 60%;
     padding:20px 20px 20px 0;
 }
+.img{
+    width: 100px;
+    border-radius: 100px;
+    display: block;
+    margin: 10px auto 20px;
+}
+
 </style>

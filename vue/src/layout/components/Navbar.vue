@@ -6,8 +6,9 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="../../assets/404_images/img.png" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
+          <img v-if="img" :src="img" class="user-avatar">
+          <img v-else src="../../assets/404_images/img.png" class="user-avatar">
+          <!-- <i class="el-icon-caret-bottom" /> -->
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link :to="{ path: '/my/my'}">
@@ -35,13 +36,44 @@ export default {
     Breadcrumb,
     Hamburger
   },
+  data () {
+    return {
+      img:'',
+      userId:''
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar'
     ])
   },
+  mounted () {
+    this.userId = JSON.parse(localStorage.getItem('userdata')).userId
+    this.details()
+  },
   methods: {
+    /**
+         * 获取用户详细信息
+         * @method details
+         */
+        details(){
+            let Params = {},
+                send = {}
+            Params.url = '/f/my/details'
+            send.userId = this.userId
+            Params.send = send
+            sendServer(Params,this).then(
+                (res)=>{
+                    console.log(res)
+                    if(res.code===0){
+                        // this.img = 'http://192.168.0.79:8083/'+res.data.img
+                        this.img = 'http://127.0.0.1:8083/'+res.data.img
+                    }
+                },(res)=>{
+                }
+            )
+        },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },

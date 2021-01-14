@@ -14,7 +14,8 @@ export default {
     }
   },
   mounted () {
-    this.getData()      
+    this.getData()     
+    console.log(navigator.userAgent.toLowerCase()) 
   },
   methods:{
     getData(){
