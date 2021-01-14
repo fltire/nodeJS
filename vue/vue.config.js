@@ -49,11 +49,11 @@ module.exports = {
           '^f': ''
         }
       },
-      'goodsAction':{
-        target: 'http://127.0.0.1:8888',// 需要跨域的地址
+      'upload':{
+        target: 'http://127.0.0.1:8078',// 需要跨域的地址
         changeOrigin: true,
         pathRewrite: {
-          '^goodsAction': ''
+          '^upload': ''
         }
       },
       'Servlet':{
