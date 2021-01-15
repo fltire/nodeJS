@@ -56,7 +56,7 @@ async function img(e,id){
     }
 }
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '5000kb'}))
 app.post('/upload', function(req, res){
     // console.log(req.body)
     //接收前台POST过来的base64
@@ -75,5 +75,14 @@ app.post('/upload', function(req, res){
         }
     });
 });
+app.use('/', function (req, res, next) {
+    console.log(req.method)
+  if(req.url=='/upload'){
+    next()
+    return
+  }
+  console.log(req.url)
+  res.sendFile(path.join(__dirname, 'downImg'+req.url));
+})
 app.listen(8078, ()=>{
 })

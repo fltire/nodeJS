@@ -1,6 +1,7 @@
 const { json } = require('express');
 const { symlinkSync } = require('fs');
 var http = require('http');
+const fs=require('fs');
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host:'localhost',
@@ -1143,9 +1144,55 @@ async function echarts(data){
         }
     }
 }
-exports.server = async function(url,data,res){
+async function upload(data,callback){
+    var urlHead = 'D:/work/ss/nodeJS/server/downImg/' //图片保存的位置
+    //接收前台POST过来的base64
+    var imgData = data.imgData;
+    //过滤data:URL
+    var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+    // 返回一个被 string 的值初始化的新的 Buffer 实例,原始二进制数据存储在 Buffer 类的实例中，        一个 Buffer 类似于一个整数数组，但它对应于 V8 堆内存之外的一块原始内存。
+    var dataBuffer = Buffer.from(base64Data, 'base64');
+    var date = new Date().getTime()
+    fs.writeFile(urlHead+date+".png", dataBuffer, function(err) {
+        if(err){
+            callback(err)
+        }else{
+            img(date+'.png',data.userId,urlHead)
+            callback({img:date+'.png'});
+        }
+    });
+}
+deleteFolderRecursive = function(url) {
+    fs.unlink(url,function(error){
+      if(error){
+          console.log(error);
+          return false;
+      }
+      console.log('删除文件成功');
+    })
+  
+  };
+async function img(e,id,urlHead){
+    let b = await c(`select * from user where user_id = ${id}`)
+    let s = await c(`update user set img = '${e}' where user_id = ${id}`)
+    if(s.affectedRows===1){
+        deleteFolderRecursive(urlHead+b[0].img);
+        return {
+            code:0,
+            msg:'修改成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'修改失败'
+        }
+    }
+}
+
+exports.server = async function(url,data,callback){
     var sql
     let date = new Date().getTime()
+    
     if(url==='/f/abcd'){
         s = await c(`SELECT * from menu order by menu_id desc`)
         let list = s.map((item)=>{
@@ -1395,7 +1442,12 @@ exports.server = async function(url,data,res){
         case '/f/home/echarts':
             return echarts(data)
             break
-
+        case '/f/getImg':
+            return getImg();
+            break
+        case '/f/upload':
+            upload(data,callback)
+            break
     }
     // return c(sql)
 }

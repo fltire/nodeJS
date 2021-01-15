@@ -68,7 +68,7 @@ export default {
                     console.log(res)
                     if(res.code===0){
                         // this.img = 'http://192.168.0.79:8083/'+res.data.img
-                        this.img = 'http://127.0.0.1:8083/'+res.data.img
+                        this.img = 'http://127.0.0.1:8888/f/img/'+res.data.img
                     }
                 },(res)=>{
                 }

@@ -1,10 +1,11 @@
 var http = require('http');
 var {server} = require('./server')
 http.createServer(async function(req,res){
-    // res.setHeader('access-control-allow-origin', '*');
+    res.setHeader('access-control-allow-origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type');
     res.writeHead(200, {'Content-Type': 'utf-8'});
     var body = ''
+    console.log(req.url)
     req.on('data', function (chunk) {
         body+= decodeURI(chunk); //一定要使用+=，如果body=chunk，因为请求favicon.ico，body会等于{}
         // body = querystring.parse(body)
@@ -17,7 +18,10 @@ http.createServer(async function(req,res){
         if(req.method=='POST'){
           console.log(req.url)
           console.log(body)
-            let  s = await server(req.url,body,res)
+            let  s = await server(req.url,body,(e)=>{
+              res.write(JSON.stringify(e));
+              res.end();
+            })
             // console.log(s,'34');
             res.write(JSON.stringify(s));
             res.end();

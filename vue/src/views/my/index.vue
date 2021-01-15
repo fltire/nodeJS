@@ -3,17 +3,8 @@
         <div class="left">
             <el-card class="box-card " header="个人信息" style="width:100%">
                 <div style="overflow:hidden;text-align:center">
-                    <el-upload
-                        class="img-p"
-                        ref='upload'
-                        :auto-upload='false' 
-                        :multiple='false'
-                        :limit="1"
-                        accept="image/jpeg,image/gif,image/png"
-                        action=''
-                        :show-file-list='false'
-                        :on-change='uploadFiles'
-                        >
+                    <el-upload class="img-p" ref='upload' :auto-upload='false' :multiple='false'
+                        :limit="1" accept="image/jpeg,image/gif,image/png" action='' :show-file-list='false' :on-change='uploadFiles' >
                         <img v-if="imageUrl" :src="imageUrl" title="点击修改头像" class="avatar img">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
@@ -66,24 +57,6 @@
                 </el-tabs>
             </el-card>
         </div>
-
-        <!-- <el-button @click='uploadFiles' size="mini" type="primary">点击上传</el-button> -->
-        <!-- <el-upload
-            ref='upload'
-            :auto-upload='false' 
-            :file-list="fileList" 
-            :multiple='false'
-            :limit="1"
-            :on-exceed="handleExceed"
-            :http-request="uploadFiles" 
-            accept="image/jpeg,image/gif,image/png"
-            action=''
-            :on-change='changeUpload'           
-            >
-            <el-button slot="trigger" size="mini" type="primary">选取图片</el-button>
-            <el-button @click='uploadFiles' size="mini" type="primary">点击上传</el-button>
-        </el-upload>     -->
-
     </div>
 </template>
 <script>
@@ -155,19 +128,38 @@ export default {
             reader.readAsDataURL(fileList[0]); //转BASE64       
             console.log(reader)
             reader.onload = function(e){
-                Axios({
-                    method: 'post',
-                    url:process.env.VUE_APP_BASE_API+'/upload',
-                    data: {
-                        imgData:e.target.result,
-                        userId:That.userId
+                console.log(e.target.result)
+                let Params = {},
+                    send = {}
+                Params.url = '/f/upload'
+                send.userId = That.userId
+                send.imgData=e.target.result
+                send.userId=That.userId
+                Params.send = send
+                sendServer(Params,That).then(
+                    (res)=>{
+                        console.log(res)
+                        // if(res.code===0){
+                            That.imageUrl = 'http://127.0.0.1:8888/f/img/'+res.img
+                            That.$refs.upload.uploadFiles =[]
+                            // this.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
+                        // }
+                    },(res)=>{
                     }
-                }).then((res)=>{
-                    console.log(res.data)
-                    That.imageUrl = 'http://127.0.0.1:8083/'+res.data.img
-                    // That.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
-                    That.$refs.upload.clearFiles()
-                })
+                )
+                // Axios({
+                //     method: 'post',
+                //     url:process.env.VUE_APP_BASE_API+'/upload',
+                //     data: {
+                //         imgData:e.target.result,
+                //         userId:That.userId
+                //     }
+                // }).then((res)=>{
+                //     console.log(res.data)
+                //     That.imageUrl = 'http://127.0.0.1:8078/'+res.data.img
+                //     // That.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
+                //     That.$refs.upload.clearFiles()
+                // })
             }
         },
         /**
@@ -188,7 +180,7 @@ export default {
                         this.dataForm.nickName = res.data.nickName
                         this.dataForm.phone = res.data.phone
                         this.dataForm.gender = res.data.gender
-                        this.imageUrl = 'http://127.0.0.1:8083/'+res.data.img
+                        this.imageUrl = 'http://127.0.0.1:8888/f/img/'+res.data.img
                         // this.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
                         this.img = res.data.img
                     }
@@ -349,6 +341,7 @@ export default {
 }
 .img{
     width: 100px;
+    height: 100px;
     border-radius: 100px;
     display: block;
     margin: 10px auto 20px;
