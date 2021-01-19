@@ -23,6 +23,7 @@
       <el-button v-if="$isPermissions('goods:add')" type="primary" size="mini" icon="el-icon-plus" @click="goodsAdd()">新增</el-button>
       <el-button v-if="$isPermissions('goods:upt')" type="success" size="mini" icon="el-icon-edit-outline" @click="goodsAdd(multipleSelection[0])" :disabled="multipleSelection.length!==1">修改</el-button>
       <el-button v-if="$isPermissions('goods:del')" type="danger" size="mini" icon="el-icon-delete" @click="goodsDel()" :disabled='multipleSelection.length===0'>删除</el-button>
+      <!-- <el-button  type="primary" size="mini" icon="el-icon-folder-opened">导出</el-button> -->
         <!-- <el-button type="primary" v-if="$store.state.role.spxz" @click="goodsAdd">添加商品</el-button> -->
     </div>
     <el-table v-loading="listLoading" :data="list" @selection-change="handleSelectionChange" :header-cell-style="{background:'#f8f8f9'}" element-loading-text="Loading">

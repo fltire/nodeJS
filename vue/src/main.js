@@ -21,7 +21,6 @@ Vue.prototype.$echarts = echarts
 Vue.prototype.$utils = utils
 Vue.prototype.$isPermissions = isPermissions
 console.log(Vue.utli)
-
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

@@ -40,6 +40,7 @@ const sendServer = (urlParams, me) => {
     let rc = "", sign = "";
     if(urlParams.url!=='/f/userAction/mobileLogin'){
         urlParams.send.token = Cookies.get('token')
+        urlParams.send.userId = JSON.parse(localStorage.getItem('userdata')).userId
     }
     params = urlParams.send;
     // if (params.TxnId !== cfg.service.getLoginId.txnId) {

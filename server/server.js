@@ -3,6 +3,8 @@ const { symlinkSync } = require('fs');
 var http = require('http');
 const fs=require('fs');
 var mysql = require('mysql');
+const first = require('ee-first');
+const e = require('express');
 var connection = mysql.createConnection({
     host:'localhost',
     user:'root',
@@ -112,14 +114,17 @@ async function mobileLogin(data1){
 }
 //商品列表
 async function goodsQry(data){
+    console.log(111111)
     let dept = await c(`SELECT * from user where user_name like '${data.token}'`)
+    console.log(222222)
     let key = [],value = [],s,length
     for(let item in data){
-        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'&&item!=='userId'){
             key.push(item)
             value.push(`${item} like '%${data[item]}%'`)
         }
     }
+    console.log(33333)
     if(key.length===0){
         s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
         length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
@@ -127,6 +132,7 @@ async function goodsQry(data){
         s = await c(`Select * from goods where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
        length = await c(`select  count(*) from goods where ${value.join(' and ')} ${dept[0].dept_id === null?'':'and dept_id like '+dept[0].dept_id} order by goods_id desc `)
     }
+    console.log(44444444)
     // let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
     // let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
     let list = []
@@ -134,6 +140,38 @@ async function goodsQry(data){
         let d = await c(`select dict_name from dict where dict_id = ${s[i].goods_type_id}`)
         let b = await c(`select dept_name from dept where dept_id = ${s[i].dept_id}`)
         list.push({goodsId:s[i].goods_id,goodsName:s[i].goods_name,goodsTypeName:d[0].dict_name,goodsRetailPrice:s[i].goods_retail_price,goodsStock:s[i].goods_stock,goodsCreate:s[i].goods_create,goodsModified:s[i].goods_modified,deptId:s[i].dept_id,goodsTypeId:s[i].goods_type_id,deptName:b[0].dept_name})
+    }
+    console.log(555555)
+    return {
+        code: 0,
+        data: {
+            AllCount:length[0]['count(*)'],
+            goodsList:list
+        }
+    }
+}
+//商品列表
+async function goodsQry1(data){
+    let key = [],value = [],s,length
+    for(let item in data){
+        if(item!=='page'&&data[item]!==''&&item!=='time'&&item!=='token'&&item!=='userId'){
+            key.push(item)
+            value.push(`${item} like '%${data[item]}%'`)
+        }
+    }
+    if(key.length===0){
+        s = await c(`SELECT * from goods1  order by goods_id desc limit ${(data.page-1)*10},10;`)
+        length = await c(`select  count(*) from goods1 `)
+    }else{
+        s = await c(`Select * from goods1 where ${value.join(' and ')}  order by goods_id desc limit ${(data.page-1)*10},10;`)
+       length = await c(`select  count(*) from goods1 where ${value.join(' and ')}  order by goods_id desc `)
+    }
+    // let length = await c(`select  count(*) from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id}`)
+    // let s = await c(`SELECT * from goods ${dept[0].dept_id === null?'':'where dept_id like '+dept[0].dept_id} order by goods_id desc limit ${(data.page-1)*10},10;`)
+    let list = []
+    for(let i=0; i<s.length;i++){
+        let d = await c(`select dict_name from dict where dict_id = ${s[i].goods_type_id}`)
+        list.push({goodsId:s[i].goods_id,goodsName:s[i].goods_name,goodsTypeName:d[0].dict_name,goodsRetailPrice:s[i].goods_retail_price,goodsStock:s[i].goods_stock,goodsCreate:s[i].goods_create,goodsModified:s[i].goods_modified,deptId:s[i].dept_id,goodsTypeId:s[i].goods_type_id})
     }
     return {
         code: 0,
@@ -185,6 +223,14 @@ async function goodsAdd(data){
         msg: '新增成功'
     }
 }
+//商品新增1
+async function goodsAdd1(data){
+    let s = await c(`insert into goods1 (goods_name,goods_type_name,goods_retail_price,goods_stock,goods_create,goods_type_id) values ('${data.goodsName}','${data.goodsTypeName}','${data.goodsRetailPrice}','${data.goodsStock}','${data.time}','${data.goodsTypeId}');`)
+    return {
+        code:0,
+        msg: '新增成功'
+    }
+}
 //桌台新增
 async function tableAdd(data){
     let s = await c(`insert into tables (TableTableName,TableAddDate,TableStatus,TableUseStatus) values ('${data.name}','${data.SsPackReqTime}','正常','空闲中');`)
@@ -206,6 +252,31 @@ async function goodsDel(data){
             code:1,
             msg:'删除失败'
         }
+    }
+}
+//商品删除1
+async function goodsDel1(data){
+    let s = await c(`delete from goods1 where goods_id in (${data.ids.join(',')})`)
+    console.log(s)
+    if(s.affectedRows!==0){
+        return {
+            code:0,
+            msg:'删除成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'删除失败'
+        }
+    }
+}
+//商品修改1
+async function goodsUpt1(data){
+    let sql = `update goods1 set goods_name = '${data.goodsName}',goods_type_name = '${data.goodsTypeName}',goods_retail_price = '${data.goodsRetailPrice}',goods_stock = '${data.goodsStock}',goods_modified = '${data.time}',goods_type_id = '${data.goodsTypeId}' where goods_id = ${data.goodsId}`
+    let s = await c(sql)
+    return {
+        code:0,
+        msg:'修改成功'
     }
 }
 //商品修改
@@ -547,12 +618,12 @@ async function getRoleData(data){
             value.push(`${item} like '%${data[item]}%'`)
         }
     }
-    if(key.length===0){
+    // if(key.length===0){
         s = await c(`SELECT * from role order by role_id desc limit ${(data.page-1)*10},10;`)
         
-    }else{
+    // }else{
     //    s = await c(`Select * from role where ${value.join(' and ')} order by id desc limit ${(data.page-1)*10},10`)
-    }
+    // }
     let list = s.map((item) => {
         return {roleId:item.role_id,roleName:item.role_name,roleCreate:item.role_create,roleModified:item.role_modified,jurisdiction:item.jurisdiction}
     })
@@ -1144,6 +1215,7 @@ async function echarts(data){
         }
     }
 }
+// 上传图片
 async function upload(data,callback){
     var urlHead = 'D:/work/ss/nodeJS/server/downImg/' //图片保存的位置
     //接收前台POST过来的base64
@@ -1162,7 +1234,8 @@ async function upload(data,callback){
         }
     });
 }
-deleteFolderRecursive = function(url) {
+// 删除图片
+function deleteFolderRecursive(url) {
     fs.unlink(url,function(error){
       if(error){
           console.log(error);
@@ -1171,7 +1244,8 @@ deleteFolderRecursive = function(url) {
       console.log('删除文件成功');
     })
   
-  };
+}
+// 保存图片名
 async function img(e,id,urlHead){
     let b = await c(`select * from user where user_id = ${id}`)
     let s = await c(`update user set img = '${e}' where user_id = ${id}`)
@@ -1188,8 +1262,206 @@ async function img(e,id,urlHead){
         }
     }
 }
+// 全部导入/导出的数据
+async function goodsAllData(){
+    let s = await c(`select * from goods1 order by goods_id desc`)
+    let list = []
+    for(let i=0; i<s.length;i++){
+        let d = await c(`select dict_name from dict where dict_id = ${s[i].goods_type_id}`)
+        list.push({goodsId:s[i].goods_id,goodsName:s[i].goods_name,goodsTypeName:d[0].dict_name,goodsRetailPrice:s[i].goods_retail_price,goodsStock:s[i].goods_stock,goodsCreate:s[i].goods_create,goodsModified:s[i].goods_modified,deptId:s[i].dept_id,goodsTypeId:s[i].goods_type_id})
+    }
+    return {
+        code: 0,
+        data: {
+            list:list
+        }
+    }
+}
+async function getOS(){
+    var os = require("os")
+    return{
+        code:0,
+        data:{
+            tmpdir:os.tmpdir(),
+            endianness:os.endianness(),
+            hostname:os.hostname(),
+            type:os.type(),
+            platform:os.platform(),
+            arch:os.arch(),
+            release:os.release(),
+            uptime:os.uptime(),
+            loadavg:os.loadavg(),
+            totalmem:os.totalmem(),
+            freemem:os.freemem(),
+            cpus:os.cpus(),
+            networkInterfaces:os.networkInterfaces(),
+        }
+    }
+}
+// 导入数据
+async function importData(data){
+    for(let i = 0;i<data.list.length;i++){
+        let s = await c(`select * from dict where dict_name = '${data.list[i].goodsTypeName}'`)
+        let d = await c(`insert into goods1 (goods_name,goods_type_name,goods_retail_price,goods_stock,goods_create,goods_type_id) values ('${data.list[i].goodsName}','${data.list[i].goodsTypeName}','${data.list[i].goodsRetailPrice}','${data.list[i].goodsStock}','${data.list[i].goodsCreate}','${s[0].dict_id}');`)
+    }
+
+    return{
+        code:0,
+        msg:'导入成功'
+    }
+}
+// 食品审核新增
+async function foodAuditAdd(data){
+    console.log(data)
+    let a = await c(`select * from user where user_id = ${data.userId}`)
+    console.log(a)
+    let d = await c(`insert into food_audit (food_name,food_create,add_staff,audit_status,food_amount,dept,food_classify) values ('${data.foodName}','${data.time}','${data.userId}','未审核','${data.foodAmount}','${a[0].dept_id}','${data.foodClassify}');`)
+    if(d.insertId){
+        return {
+            code:0,
+            msg:'新增成功'
+        }
+    }else{
+        return {
+            code:1,
+            msg:'新增失败'
+        }
+    }
+}
+// 食品分类
+async function foodClassify(data){
+    let s = await c(`select * from dict where dict_type_id = 7`)
+    let list = []
+    s.forEach(item=>{
+        list.push({value:item.dict_id,name:item.dict_name})
+    })
+    return{
+        code:0,
+        list
+    }
+}
+// 食品审核列表
+async function foodAuditList(data){
+    let dataArr = []
+    if(data.foodName!==''){
+        dataArr.push(`food_name like '%${data.foodName}%'`)
+    }
+    if(data.foodClassify!==''){
+        dataArr.push(`food_classify = '${data.foodClassify}'`)
+    }
+    if(data.auditStatus!==''){
+        dataArr.push(`audit_status = '${data.auditStatus}'`)
+    }
+    let deptId = await c(`select * from user where user_id = ${data.userId}`)
+    console.log(`select * from food_audit ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+ dataArr.join(' and ')} order by food_id desc limit ${(data.page-1)*10},10;`)
+    let s  = await c(`select * from food_audit ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+  dataArr.join(' and ')} order by food_id desc limit ${(data.page-1)*10},10;`)
+    let length = await c(`select  count(*) from food_audit ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+  dataArr.join(' and ')} order by food_id desc `)
+    let list = []
+    for(let i = 0; i<s.length;i++){
+        let add_staff = await c(`select * from user where user_id = ${s[i].add_staff}`)
+        let dept = await c(`select * from dept where dept_id = ${s[i].dept}`)
+        let food_classify = await c(`select * from dict where dict_id = ${s[i].food_classify}`)
+        let verifier = null
+        if(s[i].verifier!==null){
+            verifier = await c(`select * from user where user_id = ${s[i].verifier}`)
+        }
+        list.push({
+            foodId:s[i].food_id,
+            foodName:s[i].food_name,
+            foodCreate:s[i].food_create,
+            foodAudit:s[i].food_audit,
+            verifier:verifier?verifier[0].user_name:null,
+            addStaff:add_staff[0].user_name,
+            auditStatus:s[i].audit_status,
+            foodAmount:s[i].food_amount,
+            reasons:s[i].reasons,
+            dept:dept[0].dept_name,
+            foodClassify:food_classify[0].dict_name,
+            foodClassifyId:s[i].food_classify,
+        })
+    }
+    return{
+        code:0,
+        data:{
+            list:list,
+            AllCount:length[0]['count(*)']
+        }
+    }
+}
+// 食品列表
+async function foodList(data){
+    let dataArr = []
+    if(data.foodName!==''){
+        dataArr.push(`food_name like '%${data.foodName}%'`)
+    }
+    if(data.foodClassify!==''){
+        dataArr.push(`food_classify = '${data.foodClassify}'`)
+    }
+    let deptId = await c(`select * from user where user_id = ${data.userId}`)
+    console.log(`select * from food ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+ dataArr.join(' and ')} order by food_id desc limit ${(data.page-1)*10},10;`)
+    let s  = await c(`select * from food ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+  dataArr.join(' and ')} order by food_id desc limit ${(data.page-1)*10},10;`)
+    let length = await c(`select  count(*) from food ${deptId[0].dept_id==null?dataArr.length!=0?'where '+dataArr.join(' and '):'':'where dept = '+deptId[0].dept_id +(dataArr.length==0?'':' and ')+  dataArr.join(' and ')} order by food_id desc `)
+    let list = []
+    for(let i = 0; i<s.length;i++){
+        let dept = await c(`select * from dept where dept_id = ${s[i].dept}`)
+        let food_classify = await c(`select * from dict where dict_id = ${s[i].food_classify}`)
+        list.push({
+            foodId:s[i].food_id,
+            foodName:s[i].food_name,
+            foodCreate:s[i].food_create,
+            foodModified:s[i].food_modified,
+            foodPrice:s[i].food_price,
+            foodClassify:food_classify[0].dict_name,
+            foodAmount:s[i].food_amount,
+            dept:dept[0].dept_name,
+        })
+    }
+    return{
+        code:0,
+        data:{
+            list:list,
+            AllCount:length[0]['count(*)']
+        }
+    }
+}
+// 食品审核
+async function audit(data){
+    let a = await c(`update food_audit set audit_status = '${data.auditStatus}',reasons = '${data.reasons}',verifier = '${data.userId}',food_audit = '${data.time}' where food_id = ${data.foodId}`)
+    let food_audit = await c(`select * from food_audit where food_id = ${data.foodId}`)
+    if(data.auditStatus=='通过'){
+        let b = await c(`select * from food where food_name = '${food_audit[0].food_name}' and dept = ${food_audit[0].dept} and food_classify = ${food_audit[0].food_classify}`)
+        if(b.length!==0){
+            await c(`update food set food_amount = ${Number(b[0].food_amount)+Number(food_audit[0].food_amount)} where food_id = ${b[0].food_id}`)
+        }else{
+            let d = await c(`insert into food (food_name,food_create,food_price,food_classify,food_amount,dept) values (
+                '${food_audit[0].food_name}','${food_audit[0].food_create}','','${food_audit[0].food_classify}',
+                '${food_audit[0].food_amount}','${food_audit[0].dept}');`)
+        }
+    }
+    return{
+        code:0,
+        msg:"审核成功"
+    }
+}
+// 食品审核修改
+async function foodAuditUpt(data){
+    let a = await c(`update food_audit set food_classify = '${data.foodClassify}',food_name = '${data.foodName}',food_amount = '${data.foodAmount}',audit_status = '未审核' where food_id = ${data.id}`)
+    return{
+        code:0,
+        msg:"修改成功"
+    }
+}
+// 食品价格修改
+async function foodListUpt(data){
+    let a = await c(`update food set food_price = '${data.foodPrice}' where food_id = ${data.foodId}`)
+    return{
+        code:0,
+        msg:"修改成功"
+    }
+}
 
 exports.server = async function(url,data,callback){
+    console.log(url)
     var sql
     let date = new Date().getTime()
     
@@ -1238,6 +1510,7 @@ exports.server = async function(url,data,callback){
         case '/f/logout':
             return logout(data);
             break;
+            // 商品列表
         case '/f/goodsAction/goodsQry':
             return goodsQry(data)
             break;
@@ -1253,9 +1526,25 @@ exports.server = async function(url,data,callback){
         case '/f/goodsAction/goodsUpt':
             return goodsUpt(data)
             break;
+            // 商品列表
+        case '/f/goodsAction/goodsQry1':
+            return goodsQry1(data)
+            break;
+            // 商品新增
+        case '/f/goodsAction/goodsAdd1':
+            return goodsAdd1(data)
+            break;
+            // 商品删除
+        case '/f/goodsAction/goodsDel1':
+            return goodsDel1(data)
+            break;
+            //商品修改
+        case '/f/goodsAction/goodsUpt1':
+            return goodsUpt1(data)
+            break;
             // 台桌列表
         case '/f/restAction/tableSync':
-            return tableSync(data)
+            return tableSync1(data)
             break;
             // 台桌新增
         case '/f/restAction/tableAdd':
@@ -1442,11 +1731,47 @@ exports.server = async function(url,data,callback){
         case '/f/home/echarts':
             return echarts(data)
             break
-        case '/f/getImg':
-            return getImg();
-            break
+            // 上传图片
         case '/f/upload':
             upload(data,callback)
+            break
+            // 获取全部导入/导出数据
+        case '/f/goodsAction/goodsAllData':
+            return goodsAllData(data)
+            break
+        case '/f/goodsAction/importData':
+            return importData(data)
+            break
+        case '/f/getOS':
+            return getOS()
+            break
+            // 食品审核新增
+        case '/f/food/foodAudit/add':
+            return foodAuditAdd(data)
+            break
+            // 食品审核修改
+        case '/f/food/foodAudit/upt':
+            return foodAuditUpt(data)
+            break
+            // 食品审核列表
+        case '/f/food/foodAudit/list':
+            return foodAuditList(data)
+            break
+            // 食品分类
+        case '/f/food/foodClassify':
+            return foodClassify(data)
+            break
+            // 食品审核
+        case '/f/food/foodAudit/audit':
+            return audit(data)
+            break
+            // 食品列表
+        case '/f/food/foodList/list':
+            return foodList(data)
+            break
+            // 食品价格修改
+        case '/f/food/foodList/upt':
+            return foodListUpt(data)
             break
     }
     // return c(sql)

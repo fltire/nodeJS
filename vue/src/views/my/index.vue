@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="left">
+            
             <el-card class="box-card " header="个人信息" style="width:100%">
                 <div style="overflow:hidden;text-align:center">
                     <el-upload class="img-p" ref='upload' :auto-upload='false' :multiple='false'
@@ -140,9 +141,9 @@ export default {
                     (res)=>{
                         console.log(res)
                         // if(res.code===0){
-                            That.imageUrl = 'http://127.0.0.1:8888/f/img/'+res.img
+                            // That.imageUrl = 'http://127.0.0.1:9528/f/img/'+res.img
+                            That.imageUrl = 'http://192.168.0.79:9528/f/img/'+res.img
                             That.$refs.upload.uploadFiles =[]
-                            // this.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
                         // }
                     },(res)=>{
                     }
@@ -180,7 +181,7 @@ export default {
                         this.dataForm.nickName = res.data.nickName
                         this.dataForm.phone = res.data.phone
                         this.dataForm.gender = res.data.gender
-                        this.imageUrl = 'http://127.0.0.1:8888/f/img/'+res.data.img
+                        this.imageUrl = 'http://192.168.0.79:8888/f/img/'+res.data.img
                         // this.imageUrl = 'http://192.168.0.79:8083/'+res.data.img
                         this.img = res.data.img
                     }
